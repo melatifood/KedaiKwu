@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kasir Cafe Real-time</title>
+    <title>KasirKwu - Business Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* Mengunci layar agar tidak bisa di-scroll oleh browser HP */
         body { position: fixed; inset: 0; overscroll-behavior-y: none; }
     </style>
 </head>
@@ -19,24 +18,25 @@
 
     <div id="login-screen" class="flex flex-col items-center justify-center w-full h-full p-4 bg-gray-50 z-40 absolute inset-0">
         <div class="w-full max-w-md p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
-            <h2 class="text-2xl font-bold text-center mb-6"><i class="fa-solid fa-store text-blue-500"></i> Mulai Sesi Shift</h2>
+            <h2 class="text-2xl font-bold text-center mb-1"><i class="fa-solid fa-store text-blue-500"></i> KasirKwu</h2>
+            <p class="text-center text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest">by Business Center</p>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-600 mb-1">Tanggal</label>
-                    <input type="date" id="input-tanggal" class="w-full p-3 border rounded-xl bg-gray-50">
+                    <input type="date" id="input-tanggal" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-600 mb-1">Shift Jaga</label>
-                    <select id="input-shift" class="w-full p-3 border rounded-xl bg-gray-50">
+                    <select id="input-shift" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
                         <option value="Pagi-Siang">Pagi - Siang (08:00 - 15:00)</option>
                         <option value="Siang-Sore">Siang - Sore (15:00 - 22:00)</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Kasir</label>
-                    <input type="text" id="input-nama" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="Contoh: Addin">
+                    <input type="text" id="input-nama" class="w-full p-3 border rounded-xl bg-gray-50 text-sm" placeholder="Contoh: Addin">
                 </div>
-                <button id="btn-login" class="w-full py-3 mt-4 bg-blue-600 text-white font-bold rounded-xl shadow hover:bg-blue-700 transition">Buka Shift Sekarang</button>
+                <button id="btn-login" class="w-full py-3 mt-4 bg-blue-600 text-white font-bold rounded-xl shadow hover:bg-blue-700 transition">Mulai Sesi Sekarang</button>
             </div>
         </div>
     </div>
@@ -44,16 +44,21 @@
     <div id="pos-screen" class="hidden flex-col md:flex-row w-full h-full relative">
         
         <div class="flex-1 flex flex-col min-h-0 bg-gray-100 border-b md:border-b-0 md:border-r border-gray-200">
-            <div class="flex justify-between items-center p-3 bg-white shadow-sm shrink-0">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 bg-white shadow-sm shrink-0 gap-2">
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold text-gray-800">Terminal Kasir</h1>
+                    <h1 class="text-base sm:text-lg font-black text-gray-800">KasirKwu <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block sm:inline">by Business Center</span></h1>
                     <p id="info-sesi" class="text-[10px] sm:text-xs text-gray-500 font-semibold"></p>
                 </div>
-                <div class="flex gap-1 sm:gap-2">
-                    <button onclick="bukaRekapGlobal()" class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg text-sm font-bold hover:bg-purple-200 flex justify-center items-center" title="Rekap Penjualan"><i class="fa-solid fa-chart-pie"></i></button>
-                    <button onclick="bukaRiwayatSesi()" class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-200 flex justify-center items-center" title="Riwayat Sesi Ini"><i class="fa-solid fa-clipboard-list"></i></button>
-                    <button onclick="document.getElementById('modal-menu').classList.remove('hidden')" class="w-10 h-10 bg-gray-200 rounded-lg text-sm font-bold hover:bg-gray-300 flex justify-center items-center" title="Tambah Menu"><i class="fa-solid fa-plus"></i></button>
-                    <button onclick="tutupSesi()" class="px-3 h-10 bg-red-100 text-red-600 rounded-lg text-xs sm:text-sm font-bold hover:bg-red-200">Tutup Shift</button>
+                <div class="flex justify-between sm:justify-end gap-1 sm:gap-2 items-center w-full sm:w-auto">
+                    <div class="flex-1 sm:flex-none flex items-center gap-1 sm:mr-3 overflow-hidden">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shrink-0"></div>
+                        <p id="online-users" class="text-[10px] font-bold text-gray-500 truncate" title="Kasir Aktif">...</p>
+                    </div>
+
+                    <button onclick="bukaRekapGlobal()" class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-100 text-purple-600 rounded-lg text-sm font-bold hover:bg-purple-200 flex justify-center items-center shrink-0" title="Rekap Penjualan"><i class="fa-solid fa-chart-pie"></i></button>
+                    <button onclick="bukaRiwayatSesi()" class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-200 flex justify-center items-center shrink-0" title="Riwayat Sesi Ini"><i class="fa-solid fa-clipboard-list"></i></button>
+                    <button onclick="document.getElementById('modal-menu').classList.remove('hidden')" class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-200 rounded-lg text-sm font-bold hover:bg-gray-300 flex justify-center items-center shrink-0" title="Tambah Menu"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="tutupSesi()" class="px-2 sm:px-3 h-9 sm:h-10 bg-red-100 text-red-600 rounded-lg text-xs sm:text-sm font-bold hover:bg-red-200 shrink-0">Tutup Shift</button>
                 </div>
             </div>
             
@@ -66,18 +71,14 @@
                 <h2 class="font-bold text-sm"><i class="fa-solid fa-basket-shopping"></i> Keranjang</h2>
                 <span id="cart-badge" class="bg-red-500 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
             </div>
-            
-            <div id="cart-container" class="flex-1 overflow-y-auto min-h-0 p-2 flex flex-col gap-2 no-scrollbar bg-gray-50">
-                </div>
+            <div id="cart-container" class="flex-1 overflow-y-auto min-h-0 p-2 flex flex-col gap-2 no-scrollbar bg-gray-50"></div>
             
             <div class="p-3 bg-white border-t border-gray-200 shrink-0 flex justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
                 <div class="flex flex-col">
                     <span class="text-[10px] font-bold text-gray-500 uppercase">Total Harga</span>
                     <span id="cart-total" class="text-lg sm:text-xl font-black text-gray-800 leading-tight">Rp 0</span>
                 </div>
-                <button id="btn-bayar" class="px-6 py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                    BAYAR
-                </button>
+                <button id="btn-bayar" class="px-6 py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition">BAYAR</button>
             </div>
         </div>
     </div>
@@ -88,9 +89,7 @@
                 <span>📈 Laporan Penjualan</span>
                 <button onclick="document.getElementById('modal-rekap-global').classList.add('hidden')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
             </h2>
-            <div id="rekap-global-content" class="space-y-3">
-                <p class="text-center text-gray-500 animate-pulse">Menghitung data...</p>
-            </div>
+            <div id="rekap-global-content" class="space-y-3"><p class="text-center text-gray-500 animate-pulse">Menghitung data...</p></div>
         </div>
     </div>
 
@@ -127,9 +126,7 @@
         <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl text-center relative overflow-hidden">
             <div class="bg-red-500 w-full p-2 absolute top-0 left-0 text-white text-[10px] font-bold uppercase tracking-widest">Sesi Telah Berakhir</div>
             <h2 class="text-2xl font-black text-gray-800 mt-4 mb-1">Shift Selesai! 🎉</h2>
-            <p class="text-xs text-gray-500 mb-4 font-semibold border-b pb-2">
-                <span id="hasil-tanggal"></span> | <span id="hasil-shift"></span>
-            </p>
+            <p class="text-xs text-gray-500 mb-4 font-semibold border-b pb-2"><span id="hasil-tanggal"></span> | <span id="hasil-shift"></span></p>
             
             <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-left space-y-2 mb-4 text-sm">
                 <div class="flex justify-between"><span class="text-gray-600">Total Omset</span><span id="hasil-omset" class="font-bold text-gray-800">Rp 0</span></div>
@@ -140,23 +137,22 @@
 
             <div class="flex gap-3 text-left">
                 <div class="flex-1 bg-green-50 p-2 rounded-xl border border-green-200">
-                    <p class="text-[9px] font-bold text-green-700 uppercase">Karyawan (80%)</p>
+                    <p class="text-[9px] font-bold text-green-700 uppercase">Untuk Sobat BC (80%)</p>
                     <p id="hasil-karyawan" class="text-sm font-black text-green-800">Rp 0</p>
                 </div>
                 <div class="flex-1 bg-blue-50 p-2 rounded-xl border border-blue-200">
-                    <p class="text-[9px] font-bold text-blue-700 uppercase">Kas Cafe (20%)</p>
+                    <p class="text-[9px] font-bold text-blue-700 uppercase">Kas BC (20%)</p>
                     <p id="hasil-cafe" class="text-sm font-black text-blue-800">Rp 0</p>
                 </div>
             </div>
-
-            <button onclick="location.reload()" class="w-full mt-5 py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900 text-sm shadow-lg">Kembali ke Menu Awal</button>
+            <button onclick="keluarSesiBersih()" class="w-full mt-5 py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900 text-sm shadow-lg">Kembali ke Menu Awal</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, getDocs, deleteDoc, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, getDocs, deleteDoc, doc, setDoc, query, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAuHBepIcn-gzKDCpjpJaHHi_zwIsDLQW4",
@@ -170,7 +166,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const state = { activeSession: null, cart: [], products: [], rekapPenjualan: {}, totalOmset: 0, totalModal: 0 };
+        const state = { activeSession: null, namaKasir: null, cart: [], products: [], rekapPenjualan: {}, totalOmset: 0, totalModal: 0 };
         const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
         document.getElementById('input-tanggal').value = new Date().toISOString().split('T')[0];
@@ -184,7 +180,7 @@
             setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
         }
 
-        // 1. LOGIN & SETUP SINKRONISASI REAL-TIME (Semua HP Terhubung)
+        // 1. LOGIN & PRESENSI KASIR REALTIME
         document.getElementById('btn-login').addEventListener('click', async () => {
             const nama = document.getElementById('input-nama').value;
             const shift = document.getElementById('input-shift').value;
@@ -196,19 +192,35 @@
             try {
                 await signInAnonymously(auth);
                 state.activeSession = `${tanggal}_${shift}`;
+                state.namaKasir = nama;
                 
-                // Daftarkan Sesi ke Firebase agar bisa dipantau HP lain
-                await setDoc(doc(db, 'sessions_status', state.activeSession), { status: 'aktif' }, { merge: true });
+                // Daftarin diri ke daftar kasir online
+                const sessionRef = doc(db, 'sessions_status', state.activeSession);
+                await setDoc(sessionRef, { 
+                    status: 'aktif',
+                    kasirAktif: arrayUnion(nama)
+                }, { merge: true });
                 
-                // Listener: Jika ada 1 HP pencet Tutup, semua otomatis ikut ketutup
-                onSnapshot(doc(db, 'sessions_status', state.activeSession), (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().status === 'ditutup') {
-                        tampilkanModalAkhir();
+                // Pantau pergerakan sesi (tutup shift / siapa aja yg login)
+                onSnapshot(sessionRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.status === 'ditutup') tampilkanModalAkhir();
+                        if (data.kasirAktif) {
+                            document.getElementById('online-users').innerText = data.kasirAktif.join(', ');
+                        }
+                    }
+                });
+
+                // Bersihin nama kasir kalau dia close tab browser
+                window.addEventListener('beforeunload', () => {
+                    if(state.activeSession && state.namaKasir) {
+                        setDoc(doc(db, 'sessions_status', state.activeSession), { kasirAktif: arrayRemove(state.namaKasir) }, { merge: true });
                     }
                 });
 
                 const tanggalIndo = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(new Date(tanggal));
-                document.getElementById('info-sesi').innerHTML = `👤 ${nama} &bull; 📅 ${tanggalIndo}`;
+                document.getElementById('info-sesi').innerHTML = `📅 ${tanggalIndo}`;
                 document.getElementById('hasil-tanggal').innerText = tanggalIndo;
                 document.getElementById('hasil-shift').innerText = shift;
 
@@ -216,25 +228,29 @@
                 document.getElementById('pos-screen').classList.remove('hidden');
                 document.getElementById('pos-screen').classList.add('flex');
                 
-                loadMenu();
-                pantauTransaksiAktif(); 
-                showToast("Berhasil masuk sesi!", "success");
+                loadMenu(); pantauTransaksiAktif(); 
+                showToast(`Halo, ${nama}!`, "success");
             } catch (e) {
-                console.error(e);
                 showToast("Gagal terhubung database.", "error");
-                document.getElementById('btn-login').innerText = "Buka Shift Sekarang";
+                document.getElementById('btn-login').innerText = "Mulai Sesi Sekarang";
             }
         });
 
-        // 2. PANTAU TRANSAKSI SESI INI (Khusus Sesi Aktif)
+        // Hapus nama kalau beneran keluar dari modal akhir
+        window.keluarSesiBersih = async () => {
+            if(state.activeSession && state.namaKasir) {
+                await setDoc(doc(db, 'sessions_status', state.activeSession), { kasirAktif: arrayRemove(state.namaKasir) }, { merge: true });
+            }
+            location.reload();
+        };
+
         function pantauTransaksiAktif() {
             const q = query(collection(db, 'transactions'), where('sessionId', '==', state.activeSession));
             onSnapshot(q, (snapshot) => {
                 state.rekapPenjualan = {}; state.totalOmset = 0; state.totalModal = 0;
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    state.totalOmset += data.omset || 0;
-                    state.totalModal += data.modal || 0;
+                    state.totalOmset += data.omset || 0; state.totalModal += data.modal || 0;
                     if(data.items) {
                         data.items.forEach(item => {
                             if(!state.rekapPenjualan[item.nama]) state.rekapPenjualan[item.nama] = { qty: 0, omset: 0 };
@@ -246,7 +262,6 @@
             });
         }
 
-        // 3. LOAD MENU
         function loadMenu() {
             onSnapshot(collection(db, 'products'), (snapshot) => {
                 state.products = [];
@@ -255,7 +270,6 @@
                 snapshot.forEach(doc => {
                     const item = { id: doc.id, ...doc.data() };
                     state.products.push(item);
-                    
                     const div = document.createElement('div');
                     div.className = "bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between h-[100px] sm:h-[110px]";
                     div.innerHTML = `
@@ -275,24 +289,19 @@
             });
         }
 
-        // 4. KELOLA MENU & KERANJANG (Sama seperti biasa)
         document.getElementById('btn-simpan-menu').addEventListener('click', async () => {
-            const nama = document.getElementById('add-nama').value;
-            const hpp = parseInt(document.getElementById('add-hpp').value);
-            const harga = parseInt(document.getElementById('add-jual').value);
+            const nama = document.getElementById('add-nama').value; const hpp = parseInt(document.getElementById('add-hpp').value); const harga = parseInt(document.getElementById('add-jual').value);
             if(!nama || !hpp || !harga) return;
             document.getElementById('btn-simpan-menu').innerText = "...";
             await addDoc(collection(db, 'products'), { nama, hpp, harga });
             document.getElementById('add-nama').value = ''; document.getElementById('add-hpp').value = ''; document.getElementById('add-jual').value = '';
-            document.getElementById('modal-menu').classList.add('hidden');
-            document.getElementById('btn-simpan-menu').innerText = "Simpan";
+            document.getElementById('modal-menu').classList.add('hidden'); document.getElementById('btn-simpan-menu').innerText = "Simpan";
         });
 
         window.hapusMenu = async (id) => { if(confirm("Hapus menu ini?")) await deleteDoc(doc(db, 'products', id)); };
 
         window.tambahKeKeranjang = (id) => {
-            const produk = state.products.find(p => p.id === id);
-            const ada = state.cart.find(c => c.id === id);
+            const produk = state.products.find(p => p.id === id); const ada = state.cart.find(c => c.id === id);
             if(ada) { ada.qty++; } else { state.cart.push({...produk, qty: 1}); }
             renderKeranjang();
         };
@@ -305,11 +314,9 @@
 
         function renderKeranjang() {
             const container = document.getElementById('cart-container');
-            container.innerHTML = '';
-            let total = 0; let totalItem = 0;
+            container.innerHTML = ''; let total = 0; let totalItem = 0;
             state.cart.forEach(item => {
-                total += (item.harga * item.qty);
-                totalItem += item.qty;
+                total += (item.harga * item.qty); totalItem += item.qty;
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center p-2 bg-white border border-gray-100 rounded-lg shadow-sm shrink-0";
                 div.innerHTML = `
@@ -331,7 +338,6 @@
             document.getElementById('btn-bayar').disabled = state.cart.length === 0;
         }
 
-        // 5. BAYAR (Semua Transaksi disimpan ke koleksi global 'transactions')
         document.getElementById('btn-bayar').addEventListener('click', async () => {
             if(state.cart.length === 0) return;
             const btn = document.getElementById('btn-bayar');
@@ -340,21 +346,14 @@
                 let omset = 0; let modal = 0;
                 state.cart.forEach(item => { omset += (item.harga * item.qty); modal += (item.hpp * item.qty); });
                 await addDoc(collection(db, 'transactions'), {
-                    sessionId: state.activeSession,
-                    date: document.getElementById('input-tanggal').value,
-                    items: state.cart, omset: omset, modal: modal,
-                    timestamp: serverTimestamp()
+                    sessionId: state.activeSession, date: document.getElementById('input-tanggal').value,
+                    items: state.cart, omset: omset, modal: modal, timestamp: serverTimestamp(), kasir: state.namaKasir
                 });
-                state.cart = []; renderKeranjang();
-                showToast("Lunas!", "success");
-            } catch (error) {
-                console.error(error); showToast("Gagal memproses", "error");
-            } finally {
-                btn.disabled = state.cart.length === 0; btn.innerText = "BAYAR";
-            }
+                state.cart = []; renderKeranjang(); showToast("Lunas!", "success");
+            } catch (error) { showToast("Gagal memproses", "error"); } 
+            finally { btn.disabled = state.cart.length === 0; btn.innerText = "BAYAR"; }
         });
 
-        // 6. RIWAYAT SESI INI
         window.bukaRiwayatSesi = () => {
             let html = '';
             for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
@@ -368,78 +367,13 @@
             document.getElementById('modal-riwayat').classList.remove('hidden');
         };
 
-        // 7. REKAP GLOBAL (Harian, Mingguan, Bulanan)
         window.bukaRekapGlobal = async () => {
             document.getElementById('modal-rekap-global').classList.remove('hidden');
             const content = document.getElementById('rekap-global-content');
             content.innerHTML = '<p class="text-center text-gray-500 text-sm animate-pulse my-4">Mengambil data cloud...</p>';
-            
             try {
                 const snapshot = await getDocs(collection(db, 'transactions'));
                 const now = new Date();
                 const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-                const startOfWeek = startOfDay - (6 * 24 * 60 * 60 * 1000); // 7 Hari terakhir
-                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-
-                let omsetHari = 0, labaHari = 0, omsetMinggu = 0, labaMinggu = 0, omsetBulan = 0, labaBulan = 0;
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const txTime = data.timestamp ? data.timestamp.toMillis() : new Date(data.date).getTime();
-                    const omset = data.omset || 0;
-                    const laba = omset - (data.modal || 0);
-
-                    if (txTime >= startOfDay) { omsetHari += omset; labaHari += laba; }
-                    if (txTime >= startOfWeek) { omsetMinggu += omset; labaMinggu += laba; }
-                    if (txTime >= startOfMonth) { omsetBulan += omset; labaBulan += laba; }
-                });
-
-                // Perhitungan Gaji Bersih Global (Asumsi Karyawan 80%)
-                content.innerHTML = `
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <p class="text-[10px] font-bold text-gray-500 uppercase">Hari Ini</p>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-lg font-black text-blue-600">${formatIDR(omsetHari)}</p>
-                            <p class="text-xs font-bold text-green-600">+${formatIDR(labaHari * 0.8)} <span class="font-normal text-gray-400">gaji</span></p>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <p class="text-[10px] font-bold text-gray-500 uppercase">7 Hari Terakhir</p>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-lg font-black text-blue-600">${formatIDR(omsetMinggu)}</p>
-                            <p class="text-xs font-bold text-green-600">+${formatIDR(labaMinggu * 0.8)} <span class="font-normal text-gray-400">gaji</span></p>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <p class="text-[10px] font-bold text-gray-500 uppercase">Bulan Ini</p>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-lg font-black text-blue-600">${formatIDR(omsetBulan)}</p>
-                            <p class="text-xs font-bold text-green-600">+${formatIDR(labaBulan * 0.8)} <span class="font-normal text-gray-400">gaji</span></p>
-                        </div>
-                    </div>
-                `;
-            } catch (err) {
-                content.innerHTML = '<p class="text-center text-red-500 text-sm">Gagal memuat rekap.</p>';
-            }
-        };
-
-        // 8. TUTUP SESI (Memicu Trigger ke semua HP)
-        window.tutupSesi = async () => {
-            if(!confirm("Tutup shift? Semua HP yang tersambung akan otomatis keluar!")) return;
-            // Update status sesi di Firebase jadi 'ditutup'. Semua HP yang mantau file ini bakal bereaksi.
-            await setDoc(doc(db, 'sessions_status', state.activeSession), { status: 'ditutup' }, { merge: true });
-        };
-
-        // 9. RENDER MODAL AKHIR
-        window.tampilkanModalAkhir = () => {
-            const labaKotor = state.totalOmset - state.totalModal;
-            document.getElementById('hasil-omset').innerText = formatIDR(state.totalOmset);
-            document.getElementById('hasil-hpp').innerText = formatIDR(state.totalModal);
-            document.getElementById('hasil-kotor').innerText = formatIDR(labaKotor);
-            document.getElementById('hasil-karyawan').innerText = formatIDR(labaKotor * 0.8);
-            document.getElementById('hasil-cafe').innerText = formatIDR(labaKotor * 0.2);
-            document.getElementById('modal-hasil').classList.remove('hidden');
-        };
-    </script>
-</body>
-</html>
+                const startOfWeek = startOfDay - (6 * 24 * 60 * 60 * 1000);
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(),
