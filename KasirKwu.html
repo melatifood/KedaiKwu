@@ -72,8 +72,15 @@
         };
 
         // Firebase Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cafe-pos-realtime';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const firebaseConfig = {
+          apiKey: "AIzaSyAuHBepIcn-gzKDCpjpJaHHi_zwIsDLQW4",
+          authDomain: "kasirkwu.firebaseapp.com",
+          projectId: "kasirkwu",
+          storageBucket: "kasirkwu.firebasestorage.app",
+          messagingSenderId: "979387308486",
+          appId: "1:979387308486:web:94228039a255de5b3cfac7",
+          measurementId: "G-MKGCJHKKTK"
+        };
         let app, db, auth;
 
         try {
