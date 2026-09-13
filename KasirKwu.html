@@ -5,926 +5,403 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Kasir Cafe Real-time</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        coffee: {
-                            50: '#fdf8f6',
-                            100: '#f2e8e5',
-                            500: '#b4846c',
-                            600: '#9c6b53',
-                            700: '#7d523e',
-                            900: '#4a332a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow: hidden; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        .toast-enter { animation: slideIn 0.3s forwards; }
-        .toast-exit { animation: slideOut 0.3s forwards; }
-        
-        @keyframes pulse-border { 
-            0% { border-color: rgba(156, 107, 83, 0.4); } 
-            50% { border-color: rgba(156, 107, 83, 1); } 
-            100% { border-color: rgba(156, 107, 83, 0.4); } 
-        }
-        .active-session-card { animation: pulse-border 2s infinite; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-gray-800 h-screen w-screen flex flex-col">
+<body class="bg-gray-100 text-gray-800 font-sans h-screen flex flex-col overflow-hidden">
+    
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <div id="app" class="flex-1 w-full h-full relative">
-        <div id="loading-screen" class="absolute inset-0 bg-white flex flex-col items-center justify-center z-50">
-            <i class="fas fa-circle-notch fa-spin text-4xl text-coffee-600 mb-4"></i>
-            <p class="text-lg font-medium text-gray-600">Menyinkronkan dengan Cloud...</p>
+    <div id="login-screen" class="flex flex-col items-center justify-center w-full h-full p-4 bg-gray-50 z-40 absolute inset-0">
+        <div class="w-full max-w-md p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold text-center mb-6"><i class="fa-solid fa-store text-blue-500"></i> Kasir Cafe</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Kasir</label>
+                    <input type="text" id="input-nama" class="w-full p-3 border rounded-xl bg-gray-50" placeholder="Contoh: Addin">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Shift Jaga</label>
+                    <select id="input-shift" class="w-full p-3 border rounded-xl bg-gray-50">
+                        <option value="Pagi - Siang">Pagi - Siang (08:00 - 15:00)</option>
+                        <option value="Siang - Sore">Siang - Sore (15:00 - 22:00)</option>
+                    </select>
+                </div>
+                <button id="btn-login" class="w-full py-3 mt-2 bg-blue-600 text-white font-bold rounded-xl shadow hover:bg-blue-700 transition">Buka Sesi Kasir</button>
+            </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+    <div id="pos-screen" class="hidden flex-col md:flex-row w-full h-full relative">
+        
+        <div class="flex-1 flex flex-col h-[55vh] md:h-full bg-gray-100 border-b md:border-b-0 md:border-r border-gray-200">
+            <div class="flex justify-between items-center p-4 bg-white shadow-sm shrink-0">
+                <div>
+                    <h1 class="text-lg font-bold text-gray-800">Menu Cafe</h1>
+                    <p id="info-sesi" class="text-xs text-gray-500 font-semibold"></p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="bukaRiwayat()" class="px-3 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-200" title="Riwayat Penjualan"><i class="fa-solid fa-clipboard-list"></i></button>
+                    <button onclick="document.getElementById('modal-menu').classList.remove('hidden')" class="px-3 py-2 bg-gray-200 rounded-lg text-sm font-bold hover:bg-gray-300"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="tutupSesi()" class="px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm font-bold hover:bg-red-200">Tutup Shift</button>
+                </div>
+            </div>
+            
+            <div id="menu-container" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 gap-4 content-start no-scrollbar">
+                </div>
+        </div>
+
+        <div class="w-full md:w-[350px] lg:w-[400px] h-[45vh] md:h-full bg-white flex flex-col shrink-0">
+            <div class="p-3 bg-gray-800 text-white flex justify-between items-center shrink-0">
+                <h2 class="font-bold"><i class="fa-solid fa-basket-shopping"></i> Keranjang</h2>
+                <span id="cart-badge" class="bg-red-500 text-xs px-2 py-1 rounded-full font-bold">0</span>
+            </div>
+            
+            <div id="cart-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 no-scrollbar bg-gray-50">
+                </div>
+            
+            <div class="p-4 bg-white border-t border-gray-200 shrink-0">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-gray-500">Total Harga</span>
+                    <span id="cart-total" class="text-xl font-extrabold text-gray-800">Rp 0</span>
+                </div>
+                <button id="btn-bayar" class="w-full py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                    Proses Pembayaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-riwayat" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+            <h2 class="text-xl font-bold mb-4 flex justify-between items-center">
+                <span>Riwayat Sesi Ini</span>
+                <button onclick="document.getElementById('modal-riwayat').classList.add('hidden')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+            </h2>
+            <div id="riwayat-items" class="space-y-2 max-h-60 overflow-y-auto bg-gray-50 p-3 rounded-lg border border-gray-200">
+                </div>
+            <div class="mt-4 flex justify-between items-center border-t pt-3">
+                <span class="font-bold text-gray-600">Total Omset</span>
+                <span id="riwayat-total" class="font-black text-blue-600 text-lg">Rp 0</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-menu" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+            <h2 class="text-xl font-bold mb-4">Tambah Produk Baru</h2>
+            <div class="space-y-3">
+                <input type="text" id="add-nama" class="w-full p-2 border rounded-lg" placeholder="Nama Menu (cth: Es Teh)">
+                <input type="number" id="add-hpp" class="w-full p-2 border rounded-lg" placeholder="HPP / Modal (cth: 2000)">
+                <input type="number" id="add-jual" class="w-full p-2 border rounded-lg" placeholder="Harga Jual (cth: 5000)">
+                <div class="flex gap-2 pt-2">
+                    <button onclick="document.getElementById('modal-menu').classList.add('hidden')" class="flex-1 py-2 bg-gray-200 font-bold rounded-lg">Batal</button>
+                    <button id="btn-simpan-menu" class="flex-1 py-2 bg-blue-600 text-white font-bold rounded-lg">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-hasil" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl text-center">
+            <h2 class="text-2xl font-black text-gray-800 mb-2">Shift Selesai! 🎉</h2>
+            <p class="text-sm text-gray-500 mb-4">Rangkuman penjualan dan pembagian hasil.</p>
+            
+            <div class="text-left mb-4">
+                <p class="text-xs font-bold text-gray-500 uppercase mb-1">Item Laku Terjual:</p>
+                <div id="hasil-items" class="bg-gray-50 p-3 rounded-xl border border-gray-200 max-h-32 overflow-y-auto space-y-1">
+                    </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-left space-y-2 mb-4">
+                <div class="flex justify-between"><span class="text-gray-600">Total Omset</span><span id="hasil-omset" class="font-bold text-gray-800">Rp 0</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Total Modal (HPP)</span><span id="hasil-hpp" class="font-bold text-red-500">Rp 0</span></div>
+                <div class="w-full h-px bg-gray-300 my-1"></div>
+                <div class="flex justify-between"><span class="font-bold text-gray-800">Laba Kotor</span><span id="hasil-kotor" class="font-black text-green-600 text-lg">Rp 0</span></div>
+            </div>
+
+            <div class="flex gap-4 text-left">
+                <div class="flex-1 bg-green-50 p-3 rounded-xl border border-green-200">
+                    <p class="text-xs font-bold text-green-700 uppercase">Gaji Karyawan (80%)</p>
+                    <p id="hasil-karyawan" class="text-lg font-black text-green-800">Rp 0</p>
+                </div>
+                <div class="flex-1 bg-blue-50 p-3 rounded-xl border border-blue-200">
+                    <p class="text-xs font-bold text-blue-700 uppercase">Kas Cafe (20%)</p>
+                    <p id="hasil-cafe" class="text-lg font-black text-blue-800">Rp 0</p>
+                </div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full mt-6 py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-900 shadow-lg">Tutup & Kembali ke Login</button>
+        </div>
+    </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, collection, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-        // Global State for Real-Time Sync
-        const state = {
-            userId: null,
-            activeSession: null, 
-            cart: [],
-            menu: [], 
-            unsubProducts: null,
-            unsubSession: null
-        };
-
-        // Firebase Setup
         const firebaseConfig = {
-          apiKey: "AIzaSyAuHBepIcn-gzKDCpjpJaHHi_zwIsDLQW4",
-          authDomain: "kasirkwu.firebaseapp.com",
-          projectId: "kasirkwu",
-          storageBucket: "kasirkwu.firebasestorage.app",
-          messagingSenderId: "979387308486",
-          appId: "1:979387308486:web:94228039a255de5b3cfac7",
-          measurementId: "G-MKGCJHKKTK"
+            apiKey: "AIzaSyAuHBepIcn-gzKDCpjpJaHHi_zwIsDLQW4",
+            authDomain: "kasirkwu.firebaseapp.com",
+            projectId: "kasirkwu",
+            storageBucket: "kasirkwu.firebasestorage.app",
+            messagingSenderId: "979387308486",
+            appId: "1:979387308486:web:94228039a255de5b3cfac7"
         };
-        const appId = 'KasirKwu';
-        let app, db, auth;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-        } catch (e) {
-            console.error("Firebase init error:", e);
-            showToast("Kesalahan konfigurasi database.", "error");
-        }
+        // Memori State
+        const state = { 
+            activeSession: null, 
+            cart: [], 
+            products: [], 
+            rekapPenjualan: {}, 
+            totalOmset: 0, 
+            totalModal: 0 
+        };
 
         const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
-        const formatDate = (date) => new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(date);
-        
-        function showToast(message, type = 'success') {
+
+        function showToast(msg, type) {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-blue-500');
-            const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
-            
-            toast.className = `toast-enter flex items-center p-4 rounded-lg shadow-lg text-white ${bgColor} max-w-sm`;
-            toast.innerHTML = `<i class="fas ${icon} mr-3 text-lg"></i> <span class="font-medium">${message}</span>`;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('toast-enter');
-                toast.classList.add('toast-exit');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            const el = document.createElement('div');
+            el.className = `p-3 rounded-lg shadow-lg font-bold text-white text-sm transition-opacity duration-300 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+            el.innerText = msg;
+            container.appendChild(el);
+            setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
         }
 
-        const appContainer = document.getElementById('app');
+        // 1. LOGIN
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            const nama = document.getElementById('input-nama').value;
+            const shift = document.getElementById('input-shift').value;
+            if(!nama) return showToast("Isi nama kasir dulu bro!", "error");
 
-        function initRealtimeSync() {
-            // Listen to ALL sessions in the public data pool to find the active one
-            const sessionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
-            
-            state.unsubSession = onSnapshot(sessionsRef, (snapshot) => {
-                const allSessions = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+            document.getElementById('btn-login').innerText = "Loading...";
+            try {
+                await signInAnonymously(auth);
+                const today = new Date().toISOString().split('T')[0];
+                state.activeSession = `${today}_${shift.split(' ')[0]}`;
                 
-                // Find any currently open session
-                const openSession = allSessions.find(s => s.status === 'open');
+                document.getElementById('info-sesi').innerText = `👤 ${nama} | 🕒 ${shift}`;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('pos-screen').classList.remove('hidden');
+                document.getElementById('pos-screen').classList.add('flex');
+                
+                loadMenu();
+                pantauRiwayatTransaksi(); // Nyalain Radar Transaksi Real-time
+                showToast("Sistem siap digunakan!", "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Koneksi gagal", "error");
+                document.getElementById('btn-login').innerText = "Buka Sesi Kasir";
+            }
+        });
 
-                if (openSession) {
-                    if (!state.activeSession) {
-                        // First time seeing this active session on this device
-                        state.activeSession = openSession;
-                        showToast(`Bergabung dengan shift: ${openSession.shiftTime}`, 'info');
-                        renderPOS();
-                    } else if (state.activeSession.id !== openSession.id) {
-                        // Switching to a different open session
-                        state.activeSession = openSession;
-                        renderPOS();
-                    }
-                } else {
-                    // No open sessions exist. Did our active session just close?
-                    if (state.activeSession) {
-                        const myClosedSession = allSessions.find(s => s.id === state.activeSession.id);
-                        if (myClosedSession && myClosedSession.summary) {
-                            renderSummary(myClosedSession.summary, myClosedSession);
-                        } else {
-                            renderStartShift();
-                        }
-                        state.activeSession = null;
-                        state.cart = []; // clear cart
-                    } else {
-                        // We just loaded up and there are no active sessions
-                        renderStartShift();
-                    }
-                }
-            }, (error) => {
-                console.error("Session sync error:", error);
-                showToast("Koneksi sinkronisasi sesi terputus.", "error");
-            });
+        // 2. PANTAU TRANSAKSI (Buat Fitur Riwayat)
+        function pantauRiwayatTransaksi() {
+            onSnapshot(collection(db, 'sessions', state.activeSession, 'transactions'), (snapshot) => {
+                state.rekapPenjualan = {};
+                state.totalOmset = 0;
+                state.totalModal = 0;
 
-            // Listen to Products in real-time
-            const productsRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            state.unsubProducts = onSnapshot(productsRef, async (snapshot) => {
-                if (snapshot.empty && state.menu.length === 0) {
-                    // Seed initial data if completely empty
-                    seedDefaultProducts();
-                } else {
-                    const newMenu = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                    
-                    // Simple check if items were added/deleted to notify
-                    if (state.menu.length > 0 && newMenu.length > state.menu.length) {
-                        showToast("Produk baru ditambahkan ke menu", "info");
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    state.totalOmset += data.omset || 0;
+                    state.totalModal += data.modal || 0;
+
+                    if(data.items) {
+                        data.items.forEach(item => {
+                            if(!state.rekapPenjualan[item.nama]) {
+                                state.rekapPenjualan[item.nama] = { qty: 0, omset: 0 };
+                            }
+                            state.rekapPenjualan[item.nama].qty += item.qty;
+                            state.rekapPenjualan[item.nama].omset += (item.harga * item.qty);
+                        });
                     }
-                    
-                    state.menu = newMenu;
-                    
-                    // Re-render components if they are active
-                    if (document.getElementById('pos-menu-grid')) {
-                        renderProductGrid();
-                    }
-                    if (document.getElementById('manage-menu-list') && !document.getElementById('manage-menu-modal').classList.contains('hidden')) {
-                        window.renderManageMenuList();
-                    }
-                }
-            }, (error) => {
-                console.error("Product sync error:", error);
+                });
             });
         }
 
-        async function seedDefaultProducts() {
-            try {
-                const productsRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-                const defaults = [
-                    { name: 'Gipang Pouch', price: 12000, cost: 7000, icon: 'fa-box-open', color: 'bg-yellow-100 text-yellow-700' },
-                    { name: 'Gipang Toples', price: 25000, cost: 15000, icon: 'fa-jar', color: 'bg-yellow-200 text-yellow-800' },
-                    { name: 'Chosava', price: 10000, cost: 6000, icon: 'fa-cookie-bite', color: 'bg-orange-200 text-orange-800' }
-                ];
-                for (const item of defaults) {
-                    await addDoc(productsRef, item);
-                }
-            } catch (error) {
-                console.error("Seeding failed", error);
-            }
-        }
-
-        function renderStartShift() {
-            const today = new Date().toISOString().split('T')[0];
-            appContainer.innerHTML = `
-                <div class="h-full flex items-center justify-center p-4 bg-coffee-50 relative overflow-hidden">
-                    <!-- Background Decor -->
-                    <div class="absolute top-0 left-0 w-64 h-64 bg-coffee-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-x-1/2 -translate-y-1/2"></div>
-                    <div class="absolute bottom-0 right-0 w-64 h-64 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-x-1/2 translate-y-1/2"></div>
+        // 3. LOAD MENU
+        function loadMenu() {
+            onSnapshot(collection(db, 'products'), (snapshot) => {
+                state.products = [];
+                const container = document.getElementById('menu-container');
+                container.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const item = { id: doc.id, ...doc.data() };
+                    state.products.push(item);
                     
-                    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md relative z-10">
-                        <div class="text-center mb-8">
-                            <div class="w-16 h-16 bg-coffee-100 text-coffee-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-store text-2xl"></i>
-                            </div>
-                            <h1 class="text-2xl font-bold text-gray-800">Mulai Sesi Shift</h1>
-                            <p class="text-sm text-gray-500 mt-2">Buka sesi baru agar kasir lain dapat bergabung.</p>
-                        </div>
-                        
-                        <form id="start-shift-form" class="space-y-5">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                                <input type="date" id="shift-date" value="${today}" required 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500 outline-none transition-colors">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Waktu Shift</label>
-                                <div class="relative">
-                                    <select id="shift-time" required class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500 outline-none transition-colors bg-white">
-                                        <option value="" disabled selected>Pilih Waktu Shift...</option>
-                                        <option value="Pagi - Siang (08:00 - 15:00)">Pagi - Siang (08:00 - 15:00)</option>
-                                        <option value="Siang - Sore (15:00 - 22:00)">Siang - Sore (15:00 - 22:00)</option>
-                                    </select>
-                                    <i class="fas fa-chevron-down absolute right-4 top-3 text-gray-400 pointer-events-none"></i>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kasir Bertugas</label>
-                                <input type="text" id="shift-cashier" placeholder="Contoh: Budi, Siti" required 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-coffee-500 focus:border-coffee-500 outline-none transition-colors">
-                            </div>
-                            
-                            <button type="submit" id="btn-start-shift" class="w-full bg-coffee-600 hover:bg-coffee-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center mt-6 shadow-lg shadow-coffee-600/30">
-                                <span>Buka Shift Sekarang</span>
-                                <i class="fas fa-arrow-right ml-2"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('start-shift-form').addEventListener('submit', handleStartShift);
-        }
-
-        async function handleStartShift(e) {
-            e.preventDefault();
-            if (!state.userId) return;
-
-            const btn = document.getElementById('btn-start-shift');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuka...';
-            btn.disabled = true;
-
-            const date = document.getElementById('shift-date').value;
-            const shiftTime = document.getElementById('shift-time').value;
-            const cashierName = document.getElementById('shift-cashier').value;
-
-            try {
-                const shiftData = {
-                    date,
-                    shiftTime,
-                    cashierName,
-                    status: 'open',
-                    startTime: serverTimestamp()
-                };
-
-                const sessionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
-                await addDoc(sessionsRef, shiftData);
-                
-                // We don't need to manually transition to POS here.
-                // The onSnapshot listener on 'sessions' will detect the new 'open' status
-                // and automatically trigger renderPOS() for THIS device and ALL other connected devices!
-                
-            } catch (error) {
-                console.error("Error starting shift:", error);
-                showToast("Gagal memulai sesi. Coba lagi.", "error");
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }
-        }
-
-        function renderPOS() {
-            if (!state.activeSession) return;
-
-            appContainer.innerHTML = `
-                <div class="flex flex-col h-full bg-gray-50">
-                    <!-- Header -->
-                    <header class="bg-white border-b px-4 md:px-6 py-4 flex justify-between items-center shrink-0 shadow-sm relative z-20">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <div class="w-10 h-10 bg-gradient-to-br from-coffee-500 to-coffee-700 text-white rounded-lg flex items-center justify-center shadow-md">
-                                <i class="fas fa-coffee"></i>
-                            </div>
-                            <div>
-                                <h2 class="font-bold text-gray-800 leading-tight">Terminal Kasir</h2>
-                                <div class="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
-                                    <span class="relative flex h-2 w-2">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                    </span>
-                                    <span>${state.activeSession.shiftTime} • ${state.activeSession.cashierName}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="window.toggleManageMenu()" class="text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg font-medium transition-colors text-sm border border-gray-200 flex items-center shadow-sm">
-                                <i class="fas fa-boxes md:mr-2 text-coffee-600"></i><span class="hidden md:inline">Kelola Menu</span>
-                            </button>
-                            <button onclick="window.confirmEndShift()" class="text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 md:px-4 rounded-lg font-medium transition-colors text-sm border border-red-200 flex items-center shadow-sm ml-1 md:ml-3">
-                                <i class="fas fa-sign-out-alt md:mr-2"></i><span class="hidden md:inline">Tutup Sesi</span>
-                            </button>
-                        </div>
-                    </header>
-
-                    <!-- Main Content -->
-                    <div class="flex flex-1 overflow-hidden flex-col md:flex-row relative">
-                        <!-- Menu Area -->
-                        <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-32 md:pb-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-bold text-gray-700 text-lg">Menu Cepat</h3>
-                            </div>
-                            <div id="pos-menu-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
-                                <!-- Grid populated by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Cart Sidebar -->
-                        <div class="w-full md:w-[380px] bg-white border-l shadow-[-4px_0_15px_rgba(0,0,0,0.03)] flex flex-col z-10 h-[350px] md:h-full absolute md:relative bottom-0 transition-transform duration-300 md:translate-y-0" id="cart-container">
-                            
-                            <!-- Mobile Cart Puller -->
-                            <div class="w-full flex justify-center py-2 md:hidden bg-gray-50 rounded-t-2xl border-t cursor-pointer" onclick="toggleMobileCart()">
-                                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-                            </div>
-
-                            <div class="p-4 border-b bg-gray-50/50 flex justify-between items-center">
-                                <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                                    <i class="fas fa-shopping-cart text-coffee-600"></i> Keranjang Aktif
-                                </h3>
-                                <button onclick="window.clearCart()" class="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors hidden md:block" id="btn-clear-cart">Hapus Semua</button>
-                            </div>
-                            
-                            <!-- Cart Items -->
-                            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar bg-white">
-                                <!-- Items injected here -->
-                            </div>
-
-                            <!-- Cart Summary & Checkout -->
-                            <div class="border-t p-4 bg-gray-50 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-                                <div class="space-y-2 mb-4 text-sm">
-                                    <div class="flex justify-between font-bold text-lg text-gray-800">
-                                        <span>Total</span>
-                                        <span id="cart-total" class="text-coffee-600">Rp 0</span>
-                                    </div>
-                                </div>
-                                <button onclick="window.checkout()" id="btn-checkout" class="w-full bg-coffee-600 hover:bg-coffee-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-xl transition-all active:scale-95 flex justify-center items-center gap-2 shadow-lg shadow-coffee-600/30" disabled>
-                                    <i class="fas fa-check-circle text-lg"></i> Proses Pembayaran (<span id="cart-count">0</span>)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modals (Hidden by default) -->
-                ${renderModalsHTML()}
-            `;
-            
-            renderProductGrid();
-            updateCartUI();
-        }
-
-        function renderProductGrid() {
-            const grid = document.getElementById('pos-menu-grid');
-            if (!grid) return;
-
-            if (state.menu.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-12 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl">
-                        <i class="fas fa-box-open text-4xl mb-3"></i>
-                        <p>Menu masih kosong. Tambahkan menu baru.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = state.menu.map(item => `
-                <div onclick="window.addToCart('${item.id}')" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-coffee-300 cursor-pointer transition-all active:scale-95 flex flex-col h-full group">
-                    <div class="w-12 h-12 rounded-xl ${item.color || 'bg-gray-100 text-gray-600'} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="fas ${item.icon || 'fa-box'} text-xl"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-gray-800 leading-tight">${item.name}</h3>
-                        <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider font-semibold">HPP: ${formatIDR(item.cost)}</p>
-                    </div>
-                    <div class="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                        <span class="font-bold text-coffee-600 text-sm md:text-base">${formatIDR(item.price)}</span>
-                        <div class="w-8 h-8 rounded-lg bg-coffee-50 text-coffee-600 flex items-center justify-center group-hover:bg-coffee-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-plus text-sm"></i>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderModalsHTML() {
-            return `
-                <!-- End Shift Modal -->
-                <div id="end-shift-modal" class="hidden fixed inset-0 bg-gray-900/40 z-[60] flex items-center justify-center backdrop-blur-sm p-4 opacity-0 transition-opacity">
-                    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl scale-95 transition-transform" id="end-shift-card">
-                        <div class="text-center mb-6">
-                            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-power-off text-2xl"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-800">Tutup Sesi Ini?</h3>
-                            <p class="text-sm text-gray-500 mt-2">Aksi ini akan menutup sesi untuk <strong>SEMUA</strong> perangkat yang terhubung dan merekap total omset hari ini.</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <button onclick="window.closeModal('end-shift-modal')" class="flex-1 py-2.5 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors">Batal</button>
-                            <button onclick="window.processEndShift()" id="btn-confirm-end" class="flex-1 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors flex justify-center items-center shadow-lg shadow-red-600/30">
-                                <span>Ya, Tutup Sesi</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Manage Menu Modal -->
-                <div id="manage-menu-modal" class="hidden fixed inset-0 bg-gray-900/40 z-[60] flex items-center justify-center backdrop-blur-sm p-4 opacity-0 transition-opacity">
-                    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] scale-95 transition-transform" id="manage-menu-card">
-                        <div class="flex justify-between items-center mb-4 shrink-0">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-800">Kelola Menu Global</h3>
-                                <p class="text-xs text-gray-500 mt-1">Perubahan akan tampil di semua perangkat</p>
-                            </div>
-                            <button onclick="window.closeModal('manage-menu-modal')" class="text-gray-400 hover:bg-gray-100 hover:text-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors"><i class="fas fa-times"></i></button>
-                        </div>
-                        
-                        <form id="add-product-form" onsubmit="window.addNewProduct(event)" class="space-y-3 mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100 shrink-0">
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fas fa-plus-circle text-coffee-600"></i>
-                                <h4 class="font-semibold text-sm text-gray-700">Tambah Produk Baru</h4>
-                            </div>
-                            <div>
-                                <input type="text" id="new-product-name" placeholder="Nama Produk (Misal: Kopi Susu Gula Aren)" required class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-coffee-500 focus:ring-1 focus:ring-coffee-500 bg-white">
-                            </div>
-                            <div class="flex gap-2">
-                                <input type="number" id="new-product-cost" placeholder="HPP / Modal (Rp)" required class="w-1/2 px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-coffee-500 focus:ring-1 focus:ring-coffee-500 bg-white">
-                                <input type="number" id="new-product-price" placeholder="Harga Jual (Rp)" required class="w-1/2 px-3 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-coffee-500 focus:ring-1 focus:ring-coffee-500 bg-white">
-                            </div>
-                            <button type="submit" id="btn-add-product" class="w-full bg-coffee-600 hover:bg-coffee-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors mt-2 shadow-md">Simpan Produk</button>
-                        </form>
-
-                        <div class="flex-1 overflow-y-auto hide-scrollbar border-t pt-4">
-                            <h4 class="font-semibold text-sm text-gray-700 mb-3">Daftar Menu Aktif</h4>
-                            <div id="manage-menu-list" class="space-y-2 pb-4">
-                                <!-- list injected here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.toggleManageMenu = () => {
-            const modal = document.getElementById('manage-menu-modal');
-            const card = document.getElementById('manage-menu-card');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                // Trigger animation
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    card.classList.remove('scale-95');
-                }, 10);
-                window.renderManageMenuList();
-            } else {
-                window.closeModal('manage-menu-modal');
-            }
-        };
-
-        window.confirmEndShift = () => {
-            const modal = document.getElementById('end-shift-modal');
-            const card = document.getElementById('end-shift-card');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                card.classList.remove('scale-95');
-            }, 10);
-        };
-
-        window.closeModal = (id) => {
-            const modal = document.getElementById(id);
-            const card = modal.querySelector('div');
-            modal.classList.add('opacity-0');
-            card.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        };
-
-        window.toggleMobileCart = () => {
-            const cart = document.getElementById('cart-container');
-            if (cart.classList.contains('translate-y-[calc(100%-60px)]')) {
-                cart.classList.remove('translate-y-[calc(100%-60px)]');
-            } else {
-                cart.classList.add('translate-y-[calc(100%-60px)]');
-            }
-        };
-
-        window.renderManageMenuList = () => {
-            const list = document.getElementById('manage-menu-list');
-            if (!list) return;
-            
-            if (state.menu.length === 0) {
-                list.innerHTML = `<p class="text-sm text-gray-400 text-center py-6 italic">Belum ada menu terdaftar.</p>`;
-                return;
-            }
-
-            list.innerHTML = state.menu.map(item => `
-                <div class="flex justify-between items-center p-3 border border-gray-100 rounded-xl bg-white shadow-sm hover:border-gray-200 transition-colors">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg ${item.color} flex items-center justify-center shrink-0">
-                            <i class="fas ${item.icon}"></i>
-                        </div>
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-4 rounded-xl shadow border border-gray-100 flex flex-col justify-between";
+                    div.innerHTML = `
                         <div>
-                            <p class="font-bold text-sm text-gray-800">${item.name}</p>
-                            <p class="text-[11px] text-gray-500 font-medium">HPP: ${formatIDR(item.cost)} • Jual: ${formatIDR(item.price)}</p>
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-gray-800">${item.nama}</h3>
+                                <button onclick="hapusMenu('${item.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                            <p class="text-[10px] text-gray-400 font-semibold mb-2">HPP: ${formatIDR(item.hpp)}</p>
                         </div>
-                    </div>
-                    <button onclick="window.deleteProduct('${item.id}')" class="text-red-500 hover:bg-red-50 hover:text-red-600 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shrink-0">
-                        <i class="fas fa-trash-alt text-sm"></i>
-                    </button>
-                </div>
-            `).join('');
-        };
-
-        window.addNewProduct = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('new-product-name').value;
-            const cost = parseInt(document.getElementById('new-product-cost').value);
-            const price = parseInt(document.getElementById('new-product-price').value);
-            
-            const btn = document.getElementById('btn-add-product');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-            btn.disabled = true;
-
-            try {
-                const productsRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-                
-                const icons = ['fa-box', 'fa-mug-hot', 'fa-glass-water', 'fa-cookie-bite', 'fa-pizza-slice', 'fa-ice-cream', 'fa-hamburger'];
-                const colors = ['bg-blue-100 text-blue-700', 'bg-green-100 text-green-700', 'bg-purple-100 text-purple-700', 'bg-pink-100 text-pink-700', 'bg-amber-100 text-amber-700', 'bg-teal-100 text-teal-700'];
-                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-                const newProduct = {
-                    name, cost, price,
-                    icon: randomIcon, color: randomColor
-                };
-
-                await addDoc(productsRef, newProduct);
-                
-                // Reset form
-                document.getElementById('add-product-form').reset();
-                showToast("Produk berhasil ditambahkan!");
-                // UI updates automatically via onSnapshot
-
-            } catch (err) {
-                console.error(err);
-                showToast("Gagal menambah produk", "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        };
-
-        window.deleteProduct = async (id) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
-                await deleteDoc(docRef);
-                showToast("Produk berhasil dihapus");
-                // UI updates automatically via onSnapshot
-            } catch (err) {
-                console.error(err);
-                showToast("Gagal menghapus produk", "error");
-            }
-        };
-
-        window.addToCart = (itemId) => {
-            const item = state.menu.find(m => m.id === itemId);
-            if (!item) return;
-
-            const existingItem = state.cart.find(i => i.id === itemId);
-            if (existingItem) {
-                existingItem.qty += 1;
-            } else {
-                state.cart.push({ ...item, qty: 1 });
-            }
-            
-            // Auto open cart on mobile when adding
-            const cartContainer = document.getElementById('cart-container');
-            if (cartContainer && window.innerWidth < 768) {
-                 cartContainer.classList.remove('translate-y-[calc(100%-60px)]');
-            }
-            
-            updateCartUI();
-        };
-
-        window.updateQty = (itemId, change) => {
-            const index = state.cart.findIndex(i => i.id === itemId);
-            if (index > -1) {
-                state.cart[index].qty += change;
-                if (state.cart[index].qty <= 0) {
-                    state.cart.splice(index, 1);
-                }
-            }
-            updateCartUI();
-        };
-
-        window.clearCart = () => {
-            state.cart = [];
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const cartContainer = document.getElementById('cart-items');
-            const btnCheckout = document.getElementById('btn-checkout');
-            const cartTotalEl = document.getElementById('cart-total');
-            const cartCountEl = document.getElementById('cart-count');
-            const btnClear = document.getElementById('btn-clear-cart');
-            
-            if (!cartContainer) return;
-
-            if (state.cart.length === 0) {
-                cartContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-gray-400 opacity-70 mt-10">
-                        <i class="fas fa-shopping-basket text-5xl mb-4 text-gray-300"></i>
-                        <p class="text-sm font-medium">Belum ada pesanan</p>
-                        <p class="text-xs mt-1">Pilih menu di sebelah kiri</p>
-                    </div>
-                `;
-                btnCheckout.disabled = true;
-                if(btnClear) btnClear.classList.add('hidden');
-                cartTotalEl.innerText = formatIDR(0);
-                cartCountEl.innerText = '0';
-                return;
-            }
-
-            if(btnClear) btnClear.classList.remove('hidden');
-
-            let total = 0;
-            let count = 0;
-            
-            cartContainer.innerHTML = state.cart.map(item => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
-                count += item.qty;
-                
-                return `
-                    <div class="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between gap-2 shadow-sm animate-[slideIn_0.2s_ease-out]">
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-sm text-gray-800 truncate leading-tight">${item.name}</h4>
-                            <p class="text-coffee-600 font-semibold text-xs mt-1">${formatIDR(item.price)}</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="font-black text-blue-600 text-sm">${formatIDR(item.harga)}</span>
+                            <button onclick="tambahKeKeranjang('${item.id}')" class="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg font-bold hover:bg-blue-200">+</button>
                         </div>
-                        <div class="flex items-center gap-3 bg-gray-50 rounded-lg border border-gray-200 p-1">
-                            <button onclick="window.updateQty('${item.id}', -1)" class="w-7 h-7 flex items-center justify-center rounded bg-white text-gray-600 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors">
-                                <i class="fas ${item.qty === 1 ? 'fa-trash-alt text-red-400' : 'fa-minus'} text-xs"></i>
-                            </button>
-                            <span class="w-4 text-center text-sm font-bold text-gray-800">${item.qty}</span>
-                            <button onclick="window.updateQty('${item.id}', 1)" class="w-7 h-7 flex items-center justify-center rounded bg-white text-gray-600 shadow-sm hover:bg-gray-100 active:bg-gray-200 transition-colors">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            btnCheckout.disabled = false;
-            cartTotalEl.innerText = formatIDR(total);
-            cartCountEl.innerText = count.toString();
-        }
-
-        window.checkout = async () => {
-            if (!state.userId || !state.activeSession || state.cart.length === 0) return;
-
-            const btn = document.getElementById('btn-checkout');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            btn.disabled = true;
-
-            try {
-                let totalAmount = 0;
-                let totalCost = 0;
-                
-                const items = state.cart.map(item => {
-                    const lineTotal = item.price * item.qty;
-                    const lineCost = item.cost * item.qty;
-                    totalAmount += lineTotal;
-                    totalCost += lineCost;
-                    
-                    return {
-                        id: item.id,
-                        name: item.name,
-                        price: item.price,
-                        cost: item.cost,
-                        qty: item.qty
-                    };
+                    `;
+                    container.appendChild(div);
                 });
-
-                const orderData = {
-                    sessionId: state.activeSession.id,
-                    cashierId: state.userId, // Who processed it
-                    items: items,
-                    totalAmount,
-                    totalCost,
-                    timestamp: serverTimestamp()
-                };
-
-                const ordersRef = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
-                await addDoc(ordersRef, orderData);
-
-                showToast("Transaksi Berhasil!", "success");
-                state.cart = [];
-                updateCartUI();
-                
-                // Hide mobile cart after checkout
-                const cartContainer = document.getElementById('cart-container');
-                if (cartContainer && window.innerWidth < 768) {
-                     cartContainer.classList.add('translate-y-[calc(100%-60px)]');
-                }
-                
-            } catch (error) {
-                console.error("Error saving order:", error);
-                showToast("Gagal memproses transaksi.", "error");
-            } finally {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }
-        };
-
-        window.processEndShift = async () => {
-            if (!state.userId || !state.activeSession) return;
-            
-            const btn = document.getElementById('btn-confirm-end');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghitung Total...';
-            btn.disabled = true;
-
-            try {
-                // Fetch ALL orders globally to ensure we bypass indexing issues
-                const ordersRef = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
-                const querySnapshot = await getDocs(ordersRef);
-                
-                let totalSales = 0;
-                let totalCost = 0;
-                let orderCount = 0;
-
-                // Filter in memory for THIS specific session
-                querySnapshot.forEach((doc) => {
-                    const order = doc.data();
-                    if (order.sessionId === state.activeSession.id) {
-                        totalSales += order.totalAmount || 0;
-                        totalCost += order.totalCost || 0;
-                        orderCount++;
-                    }
-                });
-
-                const labaKotor = totalSales - totalCost;
-                
-                // NEW RULE: 80% Karyawan, 20% Cafe
-                const gajiKasir = Math.max(0, labaKotor * 0.80);
-                const labaOwner = Math.max(0, labaKotor * 0.20);
-
-                const summary = {
-                    totalSales,
-                    totalCost,
-                    grossProfit: labaKotor,
-                    cashierWage: gajiKasir,
-                    ownerShare: labaOwner,
-                    totalOrders: orderCount
-                };
-
-                // Updating this document will trigger the onSnapshot for everyone listening
-                const sessionRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', state.activeSession.id);
-                await updateDoc(sessionRef, {
-                    status: 'closed',
-                    endTime: serverTimestamp(),
-                    summary: summary
-                });
-
-                // We don't renderSummary manually here. 
-                // The onSnapshot listener will catch the 'closed' status and render it.
-
-            } catch (error) {
-                console.error("Error ending shift:", error);
-                showToast("Gagal menutup sesi. Cek koneksi internet.", "error");
-                btn.innerHTML = 'Ya, Tutup Sesi';
-                btn.disabled = false;
-            }
-        };
-
-        function renderSummary(summary, sessionData) {
-            appContainer.innerHTML = `
-                <div class="min-h-full p-4 md:p-8 bg-gray-100 flex flex-col items-center justify-center overflow-y-auto animate-[slideIn_0.3s_ease-out]">
-                    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden border border-gray-100">
-                        
-                        <!-- Receipt Header -->
-                        <div class="bg-gradient-to-r from-coffee-800 to-coffee-900 text-white p-8 text-center relative overflow-hidden">
-                            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 16px 16px;"></div>
-                            <i class="fas fa-receipt text-4xl mb-3 text-coffee-300 opacity-50 relative z-10"></i>
-                            <h2 class="text-3xl font-bold relative z-10 tracking-wide">Rekapitulasi Selesai</h2>
-                            <p class="text-coffee-200 mt-2 relative z-10 font-medium text-lg">${sessionData.cashierName} • ${sessionData.shiftTime}</p>
-                            <p class="text-coffee-300 text-sm mt-1 relative z-10">${formatDate(new Date(sessionData.date))}</p>
-                        </div>
-
-                        <div class="p-6 md:p-8">
-                            <!-- High Level Stats -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <div class="bg-gray-50 border rounded-2xl p-6 relative overflow-hidden">
-                                    <div class="absolute right-[-20px] top-[-20px] text-gray-200 text-7xl"><i class="fas fa-coins"></i></div>
-                                    <p class="text-sm text-gray-500 font-semibold mb-1 relative z-10 uppercase tracking-wider">Total Omset</p>
-                                    <p class="text-3xl font-black text-gray-800 relative z-10">${formatIDR(summary.totalSales)}</p>
-                                    <p class="text-xs text-gray-500 mt-2 relative z-10"><i class="fas fa-shopping-bag mr-1"></i> ${summary.totalOrders} Transaksi Sukses</p>
-                                </div>
-                                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 relative overflow-hidden">
-                                    <div class="absolute right-[-20px] top-[-20px] text-blue-100 text-7xl"><i class="fas fa-chart-line"></i></div>
-                                    <p class="text-sm text-blue-600 font-semibold mb-1 relative z-10 uppercase tracking-wider">Laba Kotor</p>
-                                    <p class="text-3xl font-black text-blue-800 relative z-10">${formatIDR(summary.grossProfit)}</p>
-                                    <p class="text-xs text-blue-600 mt-2 relative z-10 font-medium bg-blue-100 inline-block px-2 py-1 rounded">Modal terpakai: ${formatIDR(summary.totalCost)}</p>
-                                </div>
-                            </div>
-
-                            <hr class="border-dashed border-gray-300 mb-6">
-
-                            <!-- Profit Split -->
-                            <div class="bg-coffee-50 rounded-2xl p-4 mb-6 border border-coffee-100 flex justify-center">
-                                <h3 class="text-sm font-bold text-coffee-800 uppercase tracking-widest"><i class="fas fa-handshake mr-2"></i> Rincian Bagi Hasil</h3>
-                            </div>
-
-                            <div class="flex flex-col md:flex-row gap-4">
-                                
-                                <!-- Cashier Wage (80%) -->
-                                <div class="flex-1 bg-green-50 border-2 border-green-200 rounded-2xl p-6 relative overflow-hidden group hover:border-green-400 transition-colors">
-                                    <div class="absolute right-0 top-0 w-24 h-24 bg-green-500/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-wallet text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-green-800 text-lg leading-tight">Hak Karyawan</h4>
-                                            <span class="text-[10px] font-bold bg-green-200 text-green-800 px-2 py-0.5 rounded uppercase tracking-wider">80% Laba Kotor</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-4xl font-black text-green-700 drop-shadow-sm mt-4 tracking-tight">${formatIDR(summary.cashierWage)}</p>
-                                    <p class="text-xs text-green-700 mt-3 font-medium bg-green-100/50 p-2 rounded-lg border border-green-200 inline-block"><i class="fas fa-check-circle mr-1"></i>Bisa langsung diambil</p>
-                                </div>
-
-                                <!-- Owner Share (20%) -->
-                                <div class="flex-1 bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 relative overflow-hidden group hover:border-amber-400 transition-colors">
-                                    <div class="absolute right-0 top-0 w-24 h-24 bg-amber-500/10 rounded-bl-[100px] -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-building text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-amber-800 text-lg leading-tight">Laba Cafe</h4>
-                                            <span class="text-[10px] font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded uppercase tracking-wider">20% Laba Kotor</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-4xl font-black text-amber-700 drop-shadow-sm mt-4 tracking-tight">${formatIDR(summary.ownerShare)}</p>
-                                    <p class="text-xs text-amber-700 mt-3 font-medium bg-amber-100/50 p-2 rounded-lg border border-amber-200 inline-block"><i class="fas fa-lock mr-1"></i>Setoran ke Owner</p>
-                                </div>
-                                
-                            </div>
-
-                            <div class="mt-8 flex justify-center">
-                                <button onclick="window.location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center gap-2">
-                                    <i class="fas fa-home"></i> Kembali ke Halaman Utama
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function initApp() {
-            onAuthStateChanged(auth, async (user) => {
-                const loadingScreen = document.getElementById('loading-screen');
-
-                if (user) {
-                    state.userId = user.uid;
-                    // Start listening to live database changes across all devices
-                    initRealtimeSync(); 
-                    if (loadingScreen) loadingScreen.remove();
-                } else {
-                    console.log("Menghubungkan ke sistem terpusat...");
-                    try {
-                        const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                        if (token) {
-                            await signInWithCustomToken(auth, token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Auth failed:", error);
-                        appContainer.innerHTML = `<div class="h-full flex items-center justify-center p-8 text-center text-red-600"><div class="bg-red-50 p-6 rounded-2xl border border-red-100"><i class="fas fa-wifi text-4xl mb-4"></i><p class="font-bold">Gagal terhubung ke sistem sinkronisasi.</p><p class="text-sm mt-2 text-red-500">Silakan muat ulang halaman atau periksa koneksi internet.</p></div></div>`;
-                    }
-                }
             });
         }
 
-        // Start the application
-        if (app && auth) {
-            initApp();
+        // 4. KELOLA MENU
+        document.getElementById('btn-simpan-menu').addEventListener('click', async () => {
+            const nama = document.getElementById('add-nama').value;
+            const hpp = parseInt(document.getElementById('add-hpp').value);
+            const harga = parseInt(document.getElementById('add-jual').value);
+
+            if(!nama || !hpp || !harga) return showToast("Isi semua datanya!", "error");
+            
+            document.getElementById('btn-simpan-menu').innerText = "...";
+            await addDoc(collection(db, 'products'), { nama, hpp, harga });
+            
+            document.getElementById('add-nama').value = '';
+            document.getElementById('add-hpp').value = '';
+            document.getElementById('add-jual').value = '';
+            document.getElementById('modal-menu').classList.add('hidden');
+            document.getElementById('btn-simpan-menu').innerText = "Simpan";
+        });
+
+        window.hapusMenu = async (id) => {
+            if(confirm("Hapus menu ini?")) await deleteDoc(doc(db, 'products', id));
+        };
+
+        // 5. KERANJANG BELANJA
+        window.tambahKeKeranjang = (id) => {
+            const produk = state.products.find(p => p.id === id);
+            const ada = state.cart.find(c => c.id === id);
+            if(ada) { ada.qty++; } else { state.cart.push({...produk, qty: 1}); }
+            renderKeranjang();
+        };
+
+        window.kurangiKeranjang = (id) => {
+            const index = state.cart.findIndex(c => c.id === id);
+            if(state.cart[index].qty > 1) { state.cart[index].qty--; } else { state.cart.splice(index, 1); }
+            renderKeranjang();
+        };
+
+        function renderKeranjang() {
+            const container = document.getElementById('cart-container');
+            container.innerHTML = '';
+            let total = 0; let totalItem = 0;
+
+            state.cart.forEach(item => {
+                total += (item.harga * item.qty);
+                totalItem += item.qty;
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-white border border-gray-100 rounded-xl shadow-sm";
+                div.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-800">${item.nama}</h4>
+                        <span class="text-xs text-gray-500">${formatIDR(item.harga)}</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-gray-100 rounded-lg p-1">
+                        <button onclick="kurangiKeranjang('${item.id}')" class="w-7 h-7 bg-white rounded shadow text-red-500 font-bold">-</button>
+                        <span class="font-bold text-sm w-4 text-center">${item.qty}</span>
+                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-7 h-7 bg-white rounded shadow text-blue-500 font-bold">+</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            if(state.cart.length === 0) container.innerHTML = `<div class="text-center text-gray-400 mt-10"><i class="fa-solid fa-basket-shopping text-3xl mb-2"></i><br>Belum ada pesanan</div>`;
+
+            document.getElementById('cart-total').innerText = formatIDR(total);
+            document.getElementById('cart-badge').innerText = totalItem;
+            document.getElementById('btn-bayar').disabled = state.cart.length === 0;
         }
 
+        // 6. PROSES PEMBAYARAN
+        document.getElementById('btn-bayar').addEventListener('click', async () => {
+            if(state.cart.length === 0) return;
+            
+            const btn = document.getElementById('btn-bayar');
+            btn.disabled = true;
+            btn.innerText = "Mencatat...";
+
+            try {
+                let omset = 0; let modal = 0;
+                state.cart.forEach(item => {
+                    omset += (item.harga * item.qty);
+                    modal += (item.hpp * item.qty);
+                });
+
+                await addDoc(collection(db, 'sessions', state.activeSession, 'transactions'), {
+                    items: state.cart,
+                    omset: omset,
+                    modal: modal,
+                    timestamp: serverTimestamp()
+                });
+
+                state.cart = [];
+                renderKeranjang();
+                showToast("Transaksi Berhasil!", "success");
+            } catch (error) {
+                console.error(error);
+                showToast("Gagal memproses transaksi", "error");
+            } finally {
+                btn.disabled = state.cart.length === 0;
+                btn.innerText = "Proses Pembayaran";
+            }
+        });
+
+        // 7. BUKA MODAL RIWAYAT (Di Tengah Sesi)
+        window.bukaRiwayat = () => {
+            let itemsHtml = '';
+            for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
+                itemsHtml += `<div class="flex justify-between items-center border-b border-gray-200 py-1 last:border-0">
+                    <span class="text-sm font-semibold text-gray-700">${nama} <span class="text-xs text-blue-500 bg-blue-50 px-1 rounded">x${data.qty}</span></span>
+                    <span class="text-sm font-bold text-gray-800">${formatIDR(data.omset)}</span>
+                </div>`;
+            }
+            document.getElementById('riwayat-items').innerHTML = itemsHtml || '<p class="text-gray-400 italic text-center text-sm my-4">Belum ada transaksi di sesi ini.</p>';
+            document.getElementById('riwayat-total').innerText = formatIDR(state.totalOmset);
+            document.getElementById('modal-riwayat').classList.remove('hidden');
+        };
+
+        // 8. TUTUP SESI (Hitung Total & Rincian)
+        window.tutupSesi = async () => {
+            if(!confirm("Yakin mau tutup shift sekarang?")) return;
+            
+            const labaKotor = state.totalOmset - state.totalModal;
+            const gajiKaryawan = labaKotor * 0.8;
+            const labaCafe = labaKotor * 0.2;
+
+            // Render rincian item ke dalam modal hasil
+            let itemsHtml = '';
+            for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
+                itemsHtml += `<div class="flex justify-between text-sm border-b border-gray-100 py-1 last:border-0">
+                    <span class="text-gray-700">${nama} <span class="text-xs font-bold text-gray-400">x${data.qty}</span></span>
+                    <span class="font-semibold">${formatIDR(data.omset)}</span>
+                </div>`;
+            }
+            document.getElementById('hasil-items').innerHTML = itemsHtml || '<p class="text-gray-400 italic text-xs">Belum ada penjualan.</p>';
+
+            // Update Angka
+            document.getElementById('hasil-omset').innerText = formatIDR(state.totalOmset);
+            document.getElementById('hasil-hpp').innerText = formatIDR(state.totalModal);
+            document.getElementById('hasil-kotor').innerText = formatIDR(labaKotor);
+            document.getElementById('hasil-karyawan').innerText = formatIDR(gajiKaryawan);
+            document.getElementById('hasil-cafe').innerText = formatIDR(labaCafe);
+
+            // Tampilkan Modal (Sekarang ditahan tombol "Tutup & Kembali")
+            document.getElementById('modal-hasil').classList.remove('hidden');
+        };
     </script>
 </body>
 </html>
