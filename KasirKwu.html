@@ -69,17 +69,22 @@
                     <h1 class="text-lg font-extrabold text-slate-800 tracking-tight">KasirKwu <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-full ml-1">BC</span></h1>
                     <p id="info-sesi" class="text-xs text-slate-500 font-medium mt-1 flex items-center gap-1"></p>
                 </div>
-                <div class="flex justify-between sm:justify-end gap-2 items-center w-full sm:w-auto">
-                    <div class="flex-1 sm:flex-none flex items-center gap-2 mr-1 sm:mr-3 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 overflow-hidden">
+                <div class="flex justify-between sm:justify-end gap-2 items-center w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                    <div class="flex-1 sm:flex-none flex items-center gap-2 mr-1 sm:mr-3 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 overflow-hidden shrink-0">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        <p id="online-users" class="text-[10px] font-bold text-green-700 truncate max-w-[80px] sm:max-w-none" title="Kasir Aktif">...</p>
+                        <p id="online-users" class="text-[10px] font-bold text-green-700 truncate max-w-[100px] sm:max-w-none" title="Kasir Aktif">...</p>
                     </div>
 
                     <button onclick="bukaModal('modal-qris')" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-teal-50 hover:text-teal-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-qrcode"></i></button>
                     <button onclick="bukaModal('modal-rekap')" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-purple-50 hover:text-purple-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-chart-pie"></i></button>
                     <button onclick="bukaRiwayatSesi()" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-blue-50 hover:text-blue-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-receipt"></i></button>
                     <button onclick="bukaModal('modal-menu')" class="w-10 h-10 bg-slate-800 text-white rounded-full text-sm font-bold hover:bg-indigo-600 flex justify-center items-center shrink-0 transition-all shadow-md"><i class="fa-solid fa-plus"></i></button>
-                    <button onclick="tutupSesi()" class="px-4 h-10 bg-red-50 text-red-600 rounded-full text-xs font-extrabold hover:bg-red-500 hover:text-white transition-colors shrink-0 shadow-sm">AKHIRI JAGA</button>
+                    
+                    <!-- Tombol Logout Individu -->
+                    <button onclick="keluarSesiBersih()" class="w-10 h-10 bg-slate-100 text-slate-500 rounded-full text-sm font-bold hover:bg-slate-200 flex justify-center items-center shrink-0 transition-all shadow-sm" title="Log Out / Ganti Kasir"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    
+                    <!-- Tombol Tutup Hari (Hanya PJ) -->
+                    <button onclick="tutupSesi()" class="px-4 h-10 bg-red-50 text-red-600 rounded-full text-xs font-extrabold hover:bg-red-500 hover:text-white transition-colors shrink-0 shadow-sm">TUTUP HARI</button>
                 </div>
             </div>
             <div id="menu-container" class="flex-1 overflow-y-auto p-4 sm:p-5 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 content-start no-scrollbar pb-24 md:pb-6"></div>
@@ -105,7 +110,7 @@
 
     <!-- SEMUA MODAL DISINI -->
     
-    <!-- MODAL REKAP KEUANGAN & GAJI (BARU) -->
+    <!-- MODAL REKAP KEUANGAN & GAJI -->
     <div id="modal-rekap" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-lg shadow-2xl animate-pop flex flex-col max-h-[90vh]">
             <h2 class="text-xl font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
@@ -176,10 +181,10 @@
         </div>
     </div>
 
-    <!-- MODAL HASIL SHIFT -->
+    <!-- MODAL HASIL SHIFT & VALIDASI -->
     <div id="modal-hasil" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl text-center relative overflow-hidden flex flex-col max-h-[90vh] animate-pop">
-            <div class="bg-red-50 text-red-500 w-max px-4 py-1.5 absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-red-100 shrink-0">AKHIR TUGAS</div>
+            <div class="bg-red-50 text-red-500 w-max px-4 py-1.5 absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-red-100 shrink-0">HARI DITUTUP</div>
             <div class="overflow-y-auto no-scrollbar pt-10 pb-2">
                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
                 <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tight">Kerja Bagus!</h2>
@@ -209,8 +214,13 @@
                         <p id="hasil-cafe" class="text-base font-black text-blue-800 mt-1 relative z-10">Rp 0</p>
                     </div>
                 </div>
+
+                <!-- VALIDATOR STAMP -->
+                <div class="mt-4 border-t border-dashed border-slate-200 pt-3 text-left">
+                    <p id="hasil-validator" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center"></p>
+                </div>
             </div>
-            <button onclick="keluarSesiBersih()" class="w-full mt-4 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-600 text-sm shadow-xl">Keluar Sistem</button>
+            <button onclick="keluarSesiBersih(true)" class="w-full mt-4 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-600 text-sm shadow-xl">Keluar Sistem</button>
         </div>
     </div>
 
@@ -232,10 +242,9 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const state = { activeSessionDate: null, namaKasir: null, cart: [], products: [], rawTransactions: [], rekapPenjualan: {}, totalOmset: 0, totalModal: 0 };
+        const state = { activeSessionDate: null, namaKasir: null, activeShift: null, cart: [], products: [], rawTransactions: [], rekapPenjualan: {}, totalOmset: 0, totalModal: 0 };
         const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 
-        // DATA KELOMPOK ABSENSI
         const dataKelompok = {
             "Kelompok 1": ["Arya", "Lulu", "Tika", "danisa", "Ita", "Aida", "Revana", "Dimas"],
             "Kelompok 2": ["Aura", "Shafa", "Fania", "Gandi", "Rizki", "Zahira", "Addin"],
@@ -248,37 +257,32 @@
         const inputKelompok = document.getElementById('input-kelompok');
         const inputNama = document.getElementById('input-nama');
 
-        // Set Tanggal Hari Ini Default & Set Dropdown Otomatis
-        const today = new Date();
-        inputTanggal.value = today.toISOString().split('T')[0];
+        inputTanggal.value = new Date().toISOString().split('T')[0];
         
         function updateDropdownNama() {
-            const hariIni = new Date(inputTanggal.value).getDay(); // 0=Minggu, 1=Senin..
+            const hariIni = new Date(inputTanggal.value).getDay(); 
             if (hariIni === 1) inputKelompok.value = "Kelompok 1";
             else if (hariIni === 2) inputKelompok.value = "Kelompok 2";
             else if (hariIni === 3) inputKelompok.value = "Kelompok 3";
             else if (hariIni === 4) inputKelompok.value = "Kelompok 4";
             else inputKelompok.value = "Lainnya";
-
             renderListNama();
         }
 
         function renderListNama() {
             const klp = inputKelompok.value;
             inputNama.innerHTML = dataKelompok[klp].map(n => `<option value="${n}">${n}</option>`).join('');
-            if(klp === "Lainnya") {
-                inputNama.innerHTML = `<option value="Sobat BC 1">Sobat BC 1</option><option value="Sobat BC 2">Sobat BC 2</option>`;
-            }
+            if(klp === "Lainnya") { inputNama.innerHTML = `<option value="Sobat BC 1">Sobat BC 1</option><option value="Sobat BC 2">Sobat BC 2</option>`; }
         }
 
         inputTanggal.addEventListener('change', updateDropdownNama);
         inputKelompok.addEventListener('change', renderListNama);
-        updateDropdownNama(); // Jalankan pas pertama buka
+        updateDropdownNama();
 
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const el = document.createElement('div');
-            el.className = `px-5 py-3 rounded-2xl shadow-xl font-bold text-white text-xs tracking-wide transform transition-all duration-300 translate-y-0 opacity-100 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
+            el.className = `px-5 py-3 rounded-2xl shadow-xl font-bold text-white text-xs tracking-wide transform transition-all duration-300 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
             el.innerHTML = type === 'error' ? `<i class="fa-solid fa-circle-exclamation"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
             container.appendChild(el);
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-10px)'; setTimeout(() => el.remove(), 300); }, 3000);
@@ -287,45 +291,33 @@
         window.bukaModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
 
-        // 1. LOGIN & CATAT ABSENSI
         document.getElementById('btn-login').addEventListener('click', async () => {
-            const tanggal = inputTanggal.value;
-            const kelompok = inputKelompok.value;
-            const nama = inputNama.value;
+            const tanggal = inputTanggal.value; const kelompok = inputKelompok.value; const nama = inputNama.value;
             const shiftVal = document.getElementById('input-shift').value;
-            const poin = parseInt(shiftVal.split('_')[0]);
-            const shiftNama = shiftVal.split('_')[1];
+            const poin = parseInt(shiftVal.split('_')[0]); const shiftNama = shiftVal.split('_')[1];
             
             if(!nama || !tanggal) return showToast("Lengkapi data absen!", "error");
             document.getElementById('btn-login').innerText = "Memproses Absen...";
             
             try {
                 await signInAnonymously(auth);
-                state.activeSessionDate = tanggal; // Transaksi full seharian (gabung semua shift)
-                state.namaKasir = nama;
+                state.activeSessionDate = tanggal; state.namaKasir = nama; state.activeShift = shiftNama;
                 
-                // Simpan Data Absensi untuk Laporan Akhir Bulan
-                await setDoc(doc(db, 'attendance', `${tanggal}_${nama}`), {
-                    date: tanggal,
-                    kelompok: kelompok,
-                    nama: nama,
-                    shift: shiftNama,
-                    poin: poin,
-                    timestamp: serverTimestamp()
-                }, { merge: true });
+                await setDoc(doc(db, 'attendance', `${tanggal}_${nama}`), { date: tanggal, kelompok: kelompok, nama: nama, shift: shiftNama, poin: poin, timestamp: serverTimestamp() }, { merge: true });
                 
-                // Status Online Realtime
                 const sessionRef = doc(db, 'sessions_status', tanggal);
                 await setDoc(sessionRef, { status: 'aktif', kasirAktif: arrayUnion(`${nama} (${shiftNama})`) }, { merge: true });
                 
                 onSnapshot(sessionRef, (docSnap) => {
-                    if (docSnap.exists() && docSnap.data().kasirAktif) {
-                        document.getElementById('online-users').innerText = docSnap.data().kasirAktif.join(', ');
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.status === 'ditutup') tampilkanModalAkhir(data.validatedBy);
+                        if (data.kasirAktif) document.getElementById('online-users').innerText = data.kasirAktif.join(', ');
                     }
                 });
 
                 window.addEventListener('beforeunload', () => {
-                    if(state.activeSessionDate && state.namaKasir) { setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${shiftNama})`) }, { merge: true }); }
+                    if(state.activeSessionDate && state.namaKasir) { setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true }); }
                 });
 
                 const tanggalIndo = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(new Date(tanggal));
@@ -333,37 +325,33 @@
                 document.getElementById('hasil-tanggal').innerText = tanggalIndo;
 
                 document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('pos-screen').classList.remove('hidden');
-                document.getElementById('pos-screen').classList.add('flex');
+                document.getElementById('pos-screen').classList.remove('hidden'); document.getElementById('pos-screen').classList.add('flex');
                 
                 loadMenu(); pantauTransaksiAktif(); 
-                showToast(`Absen berhasil. Semangat bekerja, ${nama}!`, "success");
-            } catch (e) {
-                showToast("Gagal terhubung ke database.", "error");
-                document.getElementById('btn-login').innerText = "Absen & Masuk Sistem";
-            }
+                showToast(`Absen berhasil. Semangat, ${nama}!`, "success");
+            } catch (e) { document.getElementById('btn-login').innerText = "Absen & Masuk Sistem"; }
         });
 
-        window.keluarSesiBersih = async () => {
-            const shiftVal = document.getElementById('input-shift').value.split('_')[1];
-            if(state.activeSessionDate && state.namaKasir) { await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${shiftVal})`) }, { merge: true }); }
+        // LOGOUT BIASA (TANPA TUTUP HARI)
+        window.keluarSesiBersih = async (isTutupTotal = false) => {
+            if(!isTutupTotal && !confirm("Yakin ingin Keluar/Ganti Kasir? (Ini TIDAK menutup hari)")) return;
+            if(state.activeSessionDate && state.namaKasir) {
+                await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true });
+            }
             location.reload();
         };
 
-        // 2. PANTAU DATA TRANSAKSI FULL 1 HARI (Gabungan semua shift di hari tsb)
         function pantauTransaksiAktif() {
             const q = query(collection(db, 'transactions'), where('date', '==', state.activeSessionDate));
             onSnapshot(q, (snapshot) => {
                 state.rawTransactions = []; state.rekapPenjualan = {}; state.totalOmset = 0; state.totalModal = 0;
                 snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    state.rawTransactions.push({ id: docSnap.id, ...data });
+                    const data = docSnap.data(); state.rawTransactions.push({ id: docSnap.id, ...data });
                     state.totalOmset += data.omset || 0; state.totalModal += data.modal || 0;
                     if(data.items) {
                         data.items.forEach(item => {
                             if(!state.rekapPenjualan[item.nama]) state.rekapPenjualan[item.nama] = { qty: 0, omset: 0, harga: item.harga, hpp: item.hpp };
-                            state.rekapPenjualan[item.nama].qty += item.qty;
-                            state.rekapPenjualan[item.nama].omset += (item.harga * item.qty);
+                            state.rekapPenjualan[item.nama].qty += item.qty; state.rekapPenjualan[item.nama].omset += (item.harga * item.qty);
                         });
                     }
                 });
@@ -371,15 +359,11 @@
             });
         }
 
-        // KELOLA KERANJANG (Sama seperti sebelumnya)
         function loadMenu() {
             onSnapshot(collection(db, 'products'), (snapshot) => {
-                state.products = [];
-                const container = document.getElementById('menu-container');
-                container.innerHTML = '';
+                state.products = []; const container = document.getElementById('menu-container'); container.innerHTML = '';
                 snapshot.forEach(docSnap => {
-                    const item = { id: docSnap.id, ...docSnap.data() };
-                    state.products.push(item);
+                    const item = { id: docSnap.id, ...docSnap.data() }; state.products.push(item);
                     const div = document.createElement('div');
                     div.className = "bg-white p-3.5 sm:p-4 rounded-[1.25rem] shadow-sm border border-slate-100 flex flex-col justify-between h-[120px] sm:h-[130px] hover:shadow-md hover:border-indigo-100 hover:-translate-y-1 transition-all duration-200 relative group cursor-pointer overflow-hidden";
                     div.onclick = (e) => { if(e.target.tagName !== 'I' && e.target.tagName !== 'BUTTON') window.tambahKeKeranjang(item.id); };
@@ -389,10 +373,7 @@
                             <button onclick="event.stopPropagation(); hapusMenu('${item.id}')" class="absolute -top-1 -right-1 w-7 h-7 bg-red-50 text-red-400 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"><i class="fa-solid fa-trash text-[10px]"></i></button>
                         </div>
                         <div class="flex justify-between items-end mt-auto z-10 relative">
-                            <div class="flex flex-col">
-                                <p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">M: ${formatIDR(item.hpp)}</p>
-                                <span class="font-black text-indigo-600 text-sm sm:text-base">${formatIDR(item.harga)}</span>
-                            </div>
+                            <div class="flex flex-col"><p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">M: ${formatIDR(item.hpp)}</p><span class="font-black text-indigo-600 text-sm sm:text-base">${formatIDR(item.harga)}</span></div>
                             <button onclick="event.stopPropagation(); tambahKeKeranjang('${item.id}')" class="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-full font-black hover:bg-indigo-500 hover:text-white transition-colors flex items-center justify-center"><i class="fa-solid fa-plus text-xs"></i></button>
                         </div>
                     `;
@@ -411,13 +392,11 @@
         });
 
         window.hapusMenu = async (id) => { if(confirm("Hapus menu ini permanen?")) await deleteDoc(doc(db, 'products', id)); };
-
         window.tambahKeKeranjang = (id) => {
             const produk = state.products.find(p => p.id === id); const ada = state.cart.find(c => c.id === id);
             if(ada) { ada.qty++; } else { state.cart.push({...produk, qty: 1}); }
             renderKeranjang();
         };
-
         window.kurangiKeranjang = (id) => {
             const index = state.cart.findIndex(c => c.id === id);
             if(state.cart[index].qty > 1) { state.cart[index].qty--; } else { state.cart.splice(index, 1); }
@@ -425,17 +404,13 @@
         };
 
         function renderKeranjang() {
-            const container = document.getElementById('cart-container');
-            container.innerHTML = ''; let total = 0; let totalItem = 0;
+            const container = document.getElementById('cart-container'); container.innerHTML = ''; let total = 0; let totalItem = 0;
             state.cart.forEach(item => {
                 total += (item.harga * item.qty); totalItem += item.qty;
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center p-3 bg-white border border-slate-100 rounded-2xl shadow-sm shrink-0";
                 div.innerHTML = `
-                    <div class="flex-1 truncate pr-2">
-                        <h4 class="font-bold text-xs text-slate-800 truncate leading-none mb-1">${item.nama}</h4>
-                        <span class="text-[11px] font-semibold text-indigo-500">${formatIDR(item.harga)}</span>
-                    </div>
+                    <div class="flex-1 truncate pr-2"><h4 class="font-bold text-xs text-slate-800 truncate leading-none mb-1">${item.nama}</h4><span class="text-[11px] font-semibold text-indigo-500">${formatIDR(item.harga)}</span></div>
                     <div class="flex items-center gap-2.5 bg-slate-50 rounded-full border border-slate-100 p-1 shrink-0">
                         <button onclick="kurangiKeranjang('${item.id}')" class="w-6 h-6 bg-white rounded-full shadow-sm text-slate-400 hover:text-red-500 font-bold flex justify-center items-center"><i class="fa-solid fa-minus text-[8px]"></i></button>
                         <span class="font-bold text-xs w-3 text-center text-slate-700">${item.qty}</span>
@@ -445,22 +420,16 @@
                 container.appendChild(div);
             });
             if(state.cart.length === 0) container.innerHTML = `<div class="text-center text-slate-300 mt-10"><i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i><br><span class="text-xs font-semibold uppercase tracking-wider">Keranjang Kosong</span></div>`;
-            document.getElementById('cart-total').innerText = formatIDR(total);
-            document.getElementById('cart-badge').innerText = totalItem;
-            document.getElementById('btn-bayar').disabled = state.cart.length === 0;
+            document.getElementById('cart-total').innerText = formatIDR(total); document.getElementById('cart-badge').innerText = totalItem; document.getElementById('btn-bayar').disabled = state.cart.length === 0;
         }
 
         document.getElementById('btn-bayar').addEventListener('click', async () => {
             if(state.cart.length === 0) return;
-            const btn = document.getElementById('btn-bayar');
-            btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+            const btn = document.getElementById('btn-bayar'); btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
             try {
                 let omset = 0; let modal = 0;
                 state.cart.forEach(item => { omset += (item.harga * item.qty); modal += (item.hpp * item.qty); });
-                await addDoc(collection(db, 'transactions'), {
-                    date: state.activeSessionDate, // Ikat langsung ke Tanggal 
-                    items: state.cart, omset: omset, modal: modal, timestamp: serverTimestamp(), kasir: state.namaKasir
-                });
+                await addDoc(collection(db, 'transactions'), { date: state.activeSessionDate, items: state.cart, omset: omset, modal: modal, timestamp: serverTimestamp(), kasir: state.namaKasir });
                 state.cart = []; renderKeranjang(); showToast("Pembayaran Sukses!", "success");
             } catch (error) { showToast("Gagal memproses transaksi", "error"); } 
             finally { btn.disabled = state.cart.length === 0; btn.innerHTML = `BAYAR <i class="fa-solid fa-arrow-right ml-1"></i>`; }
@@ -472,13 +441,11 @@
             if(!targetTx) return showToast("Pesanan gagal dilacak", "error");
             try {
                 const itemIndex = targetTx.items.findIndex(i => i.nama === namaMenu && i.qty > 0);
-                const targetItem = targetTx.items[itemIndex];
-                const hargaSatuan = targetItem.harga || 0; const hppSatuan = targetItem.hpp || 0;
+                const targetItem = targetTx.items[itemIndex]; const hargaSatuan = targetItem.harga || 0; const hppSatuan = targetItem.hpp || 0;
                 if (targetTx.items.length === 1 && targetItem.qty === 1) { await deleteDoc(doc(db, 'transactions', targetTx.id)); } 
                 else {
                     const updatedItems = [...targetTx.items];
-                    if (targetItem.qty > 1) { updatedItems[itemIndex] = { ...targetItem, qty: targetItem.qty - 1 }; } 
-                    else { updatedItems.splice(itemIndex, 1); }
+                    if (targetItem.qty > 1) { updatedItems[itemIndex] = { ...targetItem, qty: targetItem.qty - 1 }; } else { updatedItems.splice(itemIndex, 1); }
                     await updateDoc(doc(db, 'transactions', targetTx.id), { items: updatedItems, omset: (targetTx.omset || 0) - hargaSatuan, modal: (targetTx.modal || 0) - hppSatuan });
                 }
                 showToast("1x pesanan dibatalkan", "success");
@@ -492,10 +459,7 @@
                     html += `<div class="flex justify-between items-center border-b border-dashed border-slate-200 py-3 last:border-0 group">
                         <div class="flex items-center gap-3">
                             <button onclick="koreksiRiwayat(decodeURIComponent('${encodeURIComponent(nama)}'))" class="w-7 h-7 bg-white border border-slate-200 text-slate-400 rounded-full flex justify-center items-center hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors shadow-sm" title="Kurangi pesanan"><i class="fa-solid fa-minus text-[10px]"></i></button>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-slate-700">${nama}</span>
-                                <span class="text-[10px] font-bold text-indigo-500 mt-0.5">x${data.qty}</span>
-                            </div>
+                            <div class="flex flex-col"><span class="text-xs font-bold text-slate-700">${nama}</span><span class="text-[10px] font-bold text-indigo-500 mt-0.5">x${data.qty}</span></div>
                         </div>
                         <span class="text-xs font-black text-slate-800">${formatIDR(data.omset)}</span>
                     </div>`;
@@ -507,108 +471,77 @@
 
         window.bukaRiwayatSesi = () => { renderIsiRiwayat(); bukaModal('modal-riwayat'); };
 
-        // ==========================================
-        // FITUR SUPER BARU: LAPORAN KEUANGAN & GAJI
-        // ==========================================
         window.generateLaporan = async () => {
-            const start = document.getElementById('rekap-start').value;
-            const end = document.getElementById('rekap-end').value;
-            const resContainer = document.getElementById('rekap-result');
-            
+            const start = document.getElementById('rekap-start').value; const end = document.getElementById('rekap-end').value; const resContainer = document.getElementById('rekap-result');
             if(!start || !end) return showToast("Pilih tanggal awal & akhir!", "error");
             if(start > end) return showToast("Tanggal akhir harus lebih besar!", "error");
 
             resContainer.innerHTML = '<div class="flex justify-center py-6"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-purple-500"></i></div>';
-
             try {
-                // 1. Tarik semua transaksi di rentang tanggal (Mencari Gaji Harian Kelompok)
-                const trxSnap = await getDocs(collection(db, 'transactions'));
-                const labaHarian = {}; // nyimpen total 80% per hari
-                
+                const trxSnap = await getDocs(collection(db, 'transactions')); const labaHarian = {};
                 trxSnap.forEach(doc => {
                     const data = doc.data();
                     if(data.date >= start && data.date <= end) {
                         if(!labaHarian[data.date]) labaHarian[data.date] = 0;
-                        labaHarian[data.date] += (data.omset - data.modal) * 0.8; // 80% buat Karyawan
+                        labaHarian[data.date] += (data.omset - data.modal) * 0.8;
                     }
                 });
 
-                // 2. Tarik semua Absensi di rentang tanggal
-                const attSnap = await getDocs(collection(db, 'attendance'));
-                const statsKelompok = {}; // Untuk nampung kalkulasi kelompok
-
-                // Cek siapa aja yang kerja di hari tersebut dan assign Gaji Harian ke Kelompok mereka
-                const hariSudahDihitung = new Set();
-
+                const attSnap = await getDocs(collection(db, 'attendance')); const statsKelompok = {}; const hariSudahDihitung = new Set();
                 attSnap.forEach(doc => {
                     const a = doc.data();
                     if(a.date >= start && a.date <= end) {
                         if(!statsKelompok[a.kelompok]) statsKelompok[a.kelompok] = { totalGaji: 0, totalPoin: 0, anggota: {} };
                         if(!statsKelompok[a.kelompok].anggota[a.nama]) statsKelompok[a.kelompok].anggota[a.nama] = 0;
-                        
-                        // Tambah poin anggota & total poin kelompok
-                        statsKelompok[a.kelompok].anggota[a.nama] += a.poin;
-                        statsKelompok[a.kelompok].totalPoin += a.poin;
-
-                        // Tambahkan Gaji Harian ke Total Kelompok (Pastikan cuma 1x per hari)
-                        if(!hariSudahDihitung.has(a.date)) {
-                            hariSudahDihitung.add(a.date);
-                            if(labaHarian[a.date]) statsKelompok[a.kelompok].totalGaji += labaHarian[a.date];
-                        }
+                        statsKelompok[a.kelompok].anggota[a.nama] += a.poin; statsKelompok[a.kelompok].totalPoin += a.poin;
+                        if(!hariSudahDihitung.has(a.date)) { hariSudahDihitung.add(a.date); if(labaHarian[a.date]) statsKelompok[a.kelompok].totalGaji += labaHarian[a.date]; }
                     }
                 });
 
-                // 3. Render HTML Hasil Laporan Gaji
                 let html = '';
-                if(Object.keys(statsKelompok).length === 0) {
-                    resContainer.innerHTML = `<p class="text-center text-slate-400 text-xs italic mt-4">Tidak ada data absensi di tanggal tersebut.</p>`;
-                    return;
-                }
+                if(Object.keys(statsKelompok).length === 0) { resContainer.innerHTML = `<p class="text-center text-slate-400 text-xs italic mt-4">Tidak ada data di tanggal tersebut.</p>`; return; }
 
                 for (const [namaKlp, dataKlp] of Object.entries(statsKelompok)) {
-                    // Hitung nilai 1 Poin (Harga 1 Poin = Total Gaji / Total Poin)
                     const hargaPerPoin = dataKlp.totalPoin > 0 ? dataKlp.totalGaji / dataKlp.totalPoin : 0;
-                    
                     html += `
                     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-3">
                         <div class="flex justify-between items-end border-b border-slate-200 pb-2 mb-3">
-                            <div>
-                                <h3 class="font-black text-slate-800 text-sm">${namaKlp}</h3>
-                                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Poin: ${dataKlp.totalPoin}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mb-0.5">Total Gaji Kelompok</p>
-                                <p class="font-black text-emerald-600 text-lg leading-none">${formatIDR(dataKlp.totalGaji)}</p>
-                            </div>
+                            <div><h3 class="font-black text-slate-800 text-sm">${namaKlp}</h3><p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Poin: ${dataKlp.totalPoin}</p></div>
+                            <div class="text-right"><p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mb-0.5">Total Gaji Kelompok</p><p class="font-black text-emerald-600 text-lg leading-none">${formatIDR(dataKlp.totalGaji)}</p></div>
                         </div>
                         <div class="space-y-2">`;
-                        
-                        // Detail Gaji Per Orang
                         for(const [namaOrang, poinOrang] of Object.entries(dataKlp.anggota)) {
                             const gajiOrang = poinOrang * hargaPerPoin;
-                            html += `
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-600 font-bold">${namaOrang} <span class="bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded ml-1 text-[9px]">${poinOrang} Poin</span></span>
-                                <span class="font-black text-slate-800">${formatIDR(gajiOrang)}</span>
-                            </div>`;
+                            html += `<div class="flex justify-between items-center text-xs"><span class="text-slate-600 font-bold">${namaOrang} <span class="bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded ml-1 text-[9px]">${poinOrang} Poin</span></span><span class="font-black text-slate-800">${formatIDR(gajiOrang)}</span></div>`;
                         }
-                    
                     html += `</div></div>`;
                 }
-
                 resContainer.innerHTML = html;
+            } catch (err) { resContainer.innerHTML = '<p class="text-center text-red-500 text-xs">Gagal menarik data dari server.</p>'; }
+        };
 
-            } catch (err) {
-                console.error(err);
-                resContainer.innerHTML = '<p class="text-center text-red-500 text-xs">Gagal menarik data dari server.</p>';
+        // 8. LOGIKA VALIDASI PENUTUPAN HARI (HANYA PJ)
+        window.tutupSesi = async () => {
+            const dateObj = new Date(state.activeSessionDate);
+            const day = dateObj.getDay(); // 0=Minggu, 1=Senin..
+            
+            let pjHarus = null;
+            if (day === 1) pjHarus = "Dimas";
+            else if (day === 2) pjHarus = "Addin";
+            else if (day === 3) pjHarus = "Caca";
+            else if (day === 4) pjHarus = "Nadhif";
+
+            // Cegah jika nama kasir bukan PJ yang ditentukan
+            if (pjHarus && state.namaKasir.toLowerCase() !== pjHarus.toLowerCase()) {
+                return showToast(`Akses Ditolak! Hanya PJ (${pjHarus}) yang bisa menutup hari ini.`, "error");
             }
+
+            if(!confirm(`Validasi Penutupan Hari oleh ${state.namaKasir}.\nSemua perangkat kasir akan dikeluarkan & data hari ini dikunci. Lanjutkan?`)) return;
+            
+            await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { status: 'ditutup', validatedBy: state.namaKasir }, { merge: true });
         };
 
-        window.tutupSesi = () => {
-            tampilkanModalAkhir();
-        };
-
-        function tampilkanModalAkhir() {
+        function tampilkanModalAkhir(validatorName = state.namaKasir) {
             const labaKotor = state.totalOmset - state.totalModal;
             let itemsHtml = '';
             for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
@@ -626,8 +559,11 @@
             document.getElementById('hasil-kotor').innerText = formatIDR(labaKotor);
             document.getElementById('hasil-karyawan').innerText = formatIDR(labaKotor * 0.8);
             document.getElementById('hasil-cafe').innerText = formatIDR(labaKotor * 0.2);
+            
+            document.getElementById('hasil-validator').innerHTML = `<i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Divalidasi oleh: ${validatorName || '-'}`;
             bukaModal('modal-hasil');
         }
+        window.tampilkanModalAkhir = tampilkanModalAkhir;
     </script>
 </body>
 </html>
