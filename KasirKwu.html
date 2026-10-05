@@ -80,10 +80,10 @@
                     <button onclick="bukaRiwayatSesi()" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-blue-50 hover:text-blue-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-receipt"></i></button>
                     <button onclick="bukaModal('modal-menu')" class="w-10 h-10 bg-slate-800 text-white rounded-full text-sm font-bold hover:bg-indigo-600 flex justify-center items-center shrink-0 transition-all shadow-md"><i class="fa-solid fa-plus"></i></button>
                     
-                    <!-- Tombol Logout Individu -->
-                    <button onclick="keluarSesiBersih()" class="w-10 h-10 bg-slate-100 text-slate-500 rounded-full text-sm font-bold hover:bg-slate-200 flex justify-center items-center shrink-0 transition-all shadow-sm" title="Log Out / Ganti Kasir"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    <!-- Tombol Logout Biasa -->
+                    <button onclick="keluarSesiBersih()" class="w-10 h-10 bg-slate-100 text-slate-500 rounded-full text-sm font-bold hover:bg-slate-200 hover:text-slate-700 flex justify-center items-center shrink-0 transition-all shadow-sm" title="Log Out / Ganti Kasir"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
                     
-                    <!-- Tombol Tutup Hari (Hanya PJ) -->
+                    <!-- Tombol Tutup Hari (Bakal ngebuka Modal Validasi) -->
                     <button onclick="tutupSesi()" class="px-4 h-10 bg-red-50 text-red-600 rounded-full text-xs font-extrabold hover:bg-red-500 hover:text-white transition-colors shrink-0 shadow-sm">TUTUP HARI</button>
                 </div>
             </div>
@@ -110,6 +110,23 @@
 
     <!-- SEMUA MODAL DISINI -->
     
+    <!-- MODAL VALIDASI PJ (SUPER BARU) -->
+    <div id="modal-validasi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl animate-pop flex flex-col max-h-[90vh]">
+            <h2 class="text-xl font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-user-check text-emerald-500"></i> Validasi Absen</div>
+                <button onclick="tutupModal('modal-validasi')" class="w-8 h-8 bg-slate-100 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            </h2>
+            <p class="text-[11px] text-slate-500 mb-4 shrink-0 border-b border-slate-100 pb-3">Periksa daftar kasir yang absen hari ini. Hapus jika ada anggota fiktif / tidak jaga.</p>
+            
+            <div id="list-validasi-absensi" class="flex-1 overflow-y-auto no-scrollbar space-y-2 mb-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                <!-- Data absensi masuk sini -->
+            </div>
+
+            <button id="btn-konfirmasi-tutup" onclick="konfirmasiTutup()" class="w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all shrink-0">Validasi Sah & Tutup Hari</button>
+        </div>
+    </div>
+
     <!-- MODAL REKAP KEUANGAN & GAJI -->
     <div id="modal-rekap" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-lg shadow-2xl animate-pop flex flex-col max-h-[90vh]">
@@ -181,10 +198,10 @@
         </div>
     </div>
 
-    <!-- MODAL HASIL SHIFT & VALIDASI -->
+    <!-- MODAL HASIL SHIFT -->
     <div id="modal-hasil" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl text-center relative overflow-hidden flex flex-col max-h-[90vh] animate-pop">
-            <div class="bg-red-50 text-red-500 w-max px-4 py-1.5 absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-red-100 shrink-0">HARI DITUTUP</div>
+            <div class="bg-red-50 text-red-500 w-max px-4 py-1.5 absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-red-100 shrink-0">AKHIR TUGAS</div>
             <div class="overflow-y-auto no-scrollbar pt-10 pb-2">
                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
                 <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tight">Kerja Bagus!</h2>
@@ -214,10 +231,10 @@
                         <p id="hasil-cafe" class="text-base font-black text-blue-800 mt-1 relative z-10">Rp 0</p>
                     </div>
                 </div>
-
-                <!-- VALIDATOR STAMP -->
-                <div class="mt-4 border-t border-dashed border-slate-200 pt-3 text-left">
-                    <p id="hasil-validator" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center"></p>
+                
+                <!-- TANDA TANGAN DIGITAL PJ -->
+                <div class="mt-5 pt-3 border-t border-dashed border-slate-200 text-center">
+                    <p id="hasil-validator" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest"></p>
                 </div>
             </div>
             <button onclick="keluarSesiBersih(true)" class="w-full mt-4 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-600 text-sm shadow-xl">Keluar Sistem</button>
@@ -282,7 +299,7 @@
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const el = document.createElement('div');
-            el.className = `px-5 py-3 rounded-2xl shadow-xl font-bold text-white text-xs tracking-wide transform transition-all duration-300 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
+            el.className = `px-5 py-3 rounded-2xl shadow-xl font-bold text-white text-xs tracking-wide transform transition-all duration-300 translate-y-0 opacity-100 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
             el.innerHTML = type === 'error' ? `<i class="fa-solid fa-circle-exclamation"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
             container.appendChild(el);
             setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-10px)'; setTimeout(() => el.remove(), 300); }, 3000);
@@ -291,6 +308,7 @@
         window.bukaModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
 
+        // 1. LOGIN & CATAT ABSENSI
         document.getElementById('btn-login').addEventListener('click', async () => {
             const tanggal = inputTanggal.value; const kelompok = inputKelompok.value; const nama = inputNama.value;
             const shiftVal = document.getElementById('input-shift').value;
@@ -332,12 +350,9 @@
             } catch (e) { document.getElementById('btn-login').innerText = "Absen & Masuk Sistem"; }
         });
 
-        // LOGOUT BIASA (TANPA TUTUP HARI)
         window.keluarSesiBersih = async (isTutupTotal = false) => {
-            if(!isTutupTotal && !confirm("Yakin ingin Keluar/Ganti Kasir? (Ini TIDAK menutup hari)")) return;
-            if(state.activeSessionDate && state.namaKasir) {
-                await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true });
-            }
+            if(!isTutupTotal && !confirm("Yakin ingin Keluar/Ganti Kasir?\n(Pilih ini jika mau ganti orang tapi hari belum selesai)")) return;
+            if(state.activeSessionDate && state.namaKasir) { await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true }); }
             location.reload();
         };
 
@@ -392,11 +407,13 @@
         });
 
         window.hapusMenu = async (id) => { if(confirm("Hapus menu ini permanen?")) await deleteDoc(doc(db, 'products', id)); };
+
         window.tambahKeKeranjang = (id) => {
             const produk = state.products.find(p => p.id === id); const ada = state.cart.find(c => c.id === id);
             if(ada) { ada.qty++; } else { state.cart.push({...produk, qty: 1}); }
             renderKeranjang();
         };
+
         window.kurangiKeranjang = (id) => {
             const index = state.cart.findIndex(c => c.id === id);
             if(state.cart[index].qty > 1) { state.cart[index].qty--; } else { state.cart.splice(index, 1); }
@@ -520,10 +537,12 @@
             } catch (err) { resContainer.innerHTML = '<p class="text-center text-red-500 text-xs">Gagal menarik data dari server.</p>'; }
         };
 
-        // 8. LOGIKA VALIDASI PENUTUPAN HARI (HANYA PJ)
+        // ===============================================
+        // 8. LOGIKA VALIDASI OTORISASI PJ (TUTUP HARI)
+        // ===============================================
         window.tutupSesi = async () => {
             const dateObj = new Date(state.activeSessionDate);
-            const day = dateObj.getDay(); // 0=Minggu, 1=Senin..
+            const day = dateObj.getDay(); 
             
             let pjHarus = null;
             if (day === 1) pjHarus = "Dimas";
@@ -531,14 +550,49 @@
             else if (day === 3) pjHarus = "Caca";
             else if (day === 4) pjHarus = "Nadhif";
 
-            // Cegah jika nama kasir bukan PJ yang ditentukan
             if (pjHarus && state.namaKasir.toLowerCase() !== pjHarus.toLowerCase()) {
-                return showToast(`Akses Ditolak! Hanya PJ (${pjHarus}) yang bisa menutup hari ini.`, "error");
+                return showToast(`Akses Ditolak! Hanya PJ (${pjHarus}) yang berhak menutup hari.`, "error");
             }
 
-            if(!confirm(`Validasi Penutupan Hari oleh ${state.namaKasir}.\nSemua perangkat kasir akan dikeluarkan & data hari ini dikunci. Lanjutkan?`)) return;
-            
+            // Kalau dia beneran PJ, buka Jendela Validasi Absen
+            document.getElementById('list-validasi-absensi').innerHTML = '<div class="flex justify-center p-4"><i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-2xl"></i></div>';
+            bukaModal('modal-validasi');
+
+            try { await muatDaftarAbsensi(); } catch (e) { showToast("Gagal memuat daftar absen", "error"); }
+        };
+
+        window.muatDaftarAbsensi = async () => {
+            const q = query(collection(db, 'attendance'), where('date', '==', state.activeSessionDate));
+            const attSnap = await getDocs(q);
+            let html = '';
+            attSnap.forEach(docSnap => {
+                const data = docSnap.data();
+                html += `
+                <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                    <div>
+                        <p class="text-xs font-extrabold text-slate-800">${data.nama}</p>
+                        <p class="text-[10px] text-slate-400 font-medium">${data.shift} &bull; <span class="text-indigo-500 font-bold">${data.poin} Poin</span></p>
+                    </div>
+                    <button onclick="hapusAbsensiValidasi('${docSnap.id}', '${data.nama}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Hapus absen fiktif"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                </div>`;
+            });
+            if(!html) html = '<p class="text-xs text-center text-slate-400 italic p-3">Belum ada data absen masuk.</p>';
+            document.getElementById('list-validasi-absensi').innerHTML = html;
+        };
+
+        window.hapusAbsensiValidasi = async (docId, namaOrang) => {
+            if(!confirm(`Hapus absen atas nama ${namaOrang}?\n(Poin gajinya akan hangus dan tidak bisa dikembalikan)`)) return;
+            await deleteDoc(doc(db, 'attendance', docId));
+            showToast("Satu absensi dianulir", "success");
+            await muatDaftarAbsensi(); // refresh list absen seketika
+        };
+
+        window.konfirmasiTutup = async () => {
+            if(!confirm("Validasi selesai? Semua kasir akan dikeluarkan secara paksa dan transaksi hari ini dikunci.")) return;
+            document.getElementById('btn-konfirmasi-tutup').innerText = "Mengunci Sistem...";
             await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { status: 'ditutup', validatedBy: state.namaKasir }, { merge: true });
+            tutupModal('modal-validasi');
+            document.getElementById('btn-konfirmasi-tutup').innerText = "Validasi Sah & Tutup Hari";
         };
 
         function tampilkanModalAkhir(validatorName = state.namaKasir) {
@@ -560,7 +614,9 @@
             document.getElementById('hasil-karyawan').innerText = formatIDR(labaKotor * 0.8);
             document.getElementById('hasil-cafe').innerText = formatIDR(labaKotor * 0.2);
             
-            document.getElementById('hasil-validator').innerHTML = `<i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Divalidasi oleh: ${validatorName || '-'}`;
+            // Masukin stempel siapa yang validasi
+            document.getElementById('hasil-validator').innerHTML = `<i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> DIVALIDASI OLEH: <span class="text-slate-600 font-black">${validatorName || '-'}</span>`;
+            
             bukaModal('modal-hasil');
         }
         window.tampilkanModalAkhir = tampilkanModalAkhir;
