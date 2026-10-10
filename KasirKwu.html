@@ -10,187 +10,191 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { position: fixed; inset: 0; overscroll-behavior-y: none; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-        .animate-pop { animation: popIn 0.3s ease-out forwards; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        .animate-pop { animation: popIn 0.25s ease-out forwards; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full overflow-hidden selection:bg-indigo-100">
     
-    <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- HALAMAN LOGIN (SISTEM ABSENSI) -->
+    <!-- HALAMAN LOGIN & ABSENSI -->
     <div id="login-screen" class="flex flex-col items-center justify-center w-full h-full p-4 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 z-40 absolute inset-0 overflow-y-auto">
-        <div class="w-full max-w-md p-8 bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] my-auto animate-pop">
-            <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600 shadow-inner">
-                <i class="fa-solid fa-store text-3xl"></i>
+        <div class="w-full max-w-md p-7 bg-white/90 backdrop-blur-xl border border-slate-100 rounded-[2rem] shadow-2xl my-auto animate-pop">
+            <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-3 text-indigo-600 shadow-inner">
+                <i class="fa-solid fa-store text-2xl"></i>
             </div>
-            <h2 class="text-2xl font-extrabold text-center mb-1 text-slate-800 tracking-tight">KasirKwu</h2>
-            <p class="text-center text-[10px] font-bold text-slate-400 mb-6 uppercase tracking-widest">Absensi & Sesi Kasir</p>
+            <h2 class="text-2xl font-extrabold text-center text-slate-800 tracking-tight">KasirKwu</h2>
+            <p class="text-center text-[10px] font-bold text-slate-400 mb-6 uppercase tracking-widest">by Business Center</p>
             
-            <div class="space-y-4">
+            <div class="space-y-3.5">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Tanggal Buka</label>
-                    <input type="date" id="input-tanggal" class="w-full p-3.5 border border-slate-200 rounded-2xl bg-slate-50/50 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold text-slate-700">
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Tanggal Jaga</label>
+                    <input type="date" id="input-tanggal" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Pilih Kelompok (Otomatis)</label>
-                    <select id="input-kelompok" class="w-full p-3.5 border border-slate-200 rounded-2xl bg-slate-50/50 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold text-indigo-700">
-                        <option value="Kelompok 1">Kelompok 1 (Senin)</option>
-                        <option value="Kelompok 2">Kelompok 2 (Selasa)</option>
-                        <option value="Kelompok 3">Kelompok 3 (Rabu)</option>
-                        <option value="Kelompok 4">Kelompok 4 (Kamis)</option>
-                        <option value="Lainnya">Lainnya / Akhir Pekan</option>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Pilih Jadwal / Event</label>
+                    <select id="input-kelompok" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm font-bold text-indigo-700 outline-none focus:bg-white focus:border-indigo-500">
+                        <option value="Kelompok 1">Kelompok 1 (Senin - PJ: Dimas) [80:20]</option>
+                        <option value="Kelompok 2">Kelompok 2 (Selasa - PJ: Addin) [80:20]</option>
+                        <option value="Kelompok 3">Kelompok 3 (Rabu - PJ: Caca) [80:20]</option>
+                        <option value="Kelompok 4">Kelompok 4 (Kamis - PJ: Nadhif) [80:20]</option>
+                        <option value="Bazar Wisuda">🎓 Bazar Wisuda / Event (Semua Anggota) [70:30]</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Pilih Nama Anggota</label>
-                    <select id="input-nama" class="w-full p-3.5 border border-slate-200 rounded-2xl bg-slate-50/50 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold text-slate-700">
-                        <!-- Otomatis terisi JS -->
-                    </select>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Nama Anggota (Urut Abjad A-Z)</label>
+                    <select id="input-nama" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-500"></select>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Shift Jaga (Penentu Poin)</label>
-                    <select id="input-shift" class="w-full p-3.5 border border-slate-200 rounded-2xl bg-slate-50/50 text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold text-slate-700">
-                        <option value="1_Pagi-Siang">Pagi - Siang (Nilai: 1 Poin)</option>
-                        <option value="1_Siang-Sore">Siang - Sore (Nilai: 1 Poin)</option>
-                        <option value="2_Full-Shift">Full Shift Pagi - Sore (Nilai: 2 Poin)</option>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase">Shift Jaga & Poin</label>
+                    <select id="input-shift" class="w-full p-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-indigo-500">
+                        <option value="1_Shift 1 (Pagi-Siang)">Shift 1: Pagi - Siang (1 Poin)</option>
+                        <option value="1_Shift 2 (Siang-Sore)">Shift 2: Siang - Sore (1 Poin)</option>
+                        <option value="2_Full Shift (Pagi-Sore)">Full Shift: Pagi - Sore (2 Poin)</option>
                     </select>
                 </div>
-                <button id="btn-login" class="w-full py-4 mt-6 bg-slate-900 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:bg-indigo-600 hover:-translate-y-0.5 active:scale-95 transition-all duration-200">Absen & Masuk Sistem</button>
+                <button id="btn-login" class="w-full py-3.5 mt-4 bg-slate-900 text-white font-bold rounded-2xl shadow-xl hover:bg-indigo-600 active:scale-95 transition-all">Absen & Buka Kasir</button>
             </div>
         </div>
     </div>
 
     <!-- HALAMAN UTAMA KASIR -->
     <div id="pos-screen" class="hidden flex-col md:flex-row w-full h-full relative">
-        <div class="flex-1 flex flex-col min-h-0 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-white/80 backdrop-blur-md shadow-sm shrink-0 gap-3 sticky top-0 z-20">
+        <div class="flex-1 flex flex-col min-h-0 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3.5 bg-white shadow-sm shrink-0 gap-2 z-20">
                 <div>
-                    <h1 class="text-lg font-extrabold text-slate-800 tracking-tight">KasirKwu <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-full ml-1">BC</span></h1>
-                    <p id="info-sesi" class="text-xs text-slate-500 font-medium mt-1 flex items-center gap-1"></p>
-                </div>
-                <div class="flex justify-between sm:justify-end gap-2 items-center w-full sm:w-auto overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-                    <div class="flex-1 sm:flex-none flex items-center gap-2 mr-1 sm:mr-3 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 overflow-hidden shrink-0">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shrink-0 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                        <p id="online-users" class="text-[10px] font-bold text-green-700 truncate max-w-[100px] sm:max-w-none" title="Kasir Aktif">...</p>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-extrabold text-slate-800 tracking-tight">KasirKwu <span class="text-[10px] font-bold text-slate-400">by Business Center</span></h1>
+                        <span id="badge-mode" class="text-[9px] font-extrabold text-indigo-600 uppercase bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">BC</span>
                     </div>
-
-                    <button onclick="bukaModal('modal-qris')" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-teal-50 hover:text-teal-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-qrcode"></i></button>
-                    <button onclick="bukaModal('modal-rekap')" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-purple-50 hover:text-purple-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-chart-pie"></i></button>
-                    <button onclick="bukaRiwayatSesi()" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-bold hover:bg-blue-50 hover:text-blue-600 flex justify-center items-center shrink-0 transition-all shadow-sm"><i class="fa-solid fa-receipt"></i></button>
-                    <button onclick="bukaModal('modal-menu')" class="w-10 h-10 bg-slate-800 text-white rounded-full text-sm font-bold hover:bg-indigo-600 flex justify-center items-center shrink-0 transition-all shadow-md"><i class="fa-solid fa-plus"></i></button>
-                    
-                    <!-- Tombol Logout Biasa -->
-                    <button onclick="keluarSesiBersih()" class="w-10 h-10 bg-slate-100 text-slate-500 rounded-full text-sm font-bold hover:bg-slate-200 hover:text-slate-700 flex justify-center items-center shrink-0 transition-all shadow-sm" title="Log Out / Ganti Kasir"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
-                    
-                    <!-- Tombol Tutup Hari (Bakal ngebuka Modal Validasi) -->
-                    <button onclick="tutupSesi()" class="px-4 h-10 bg-red-50 text-red-600 rounded-full text-xs font-extrabold hover:bg-red-500 hover:text-white transition-colors shrink-0 shadow-sm">TUTUP HARI</button>
+                    <p id="info-sesi" class="text-[11px] text-slate-500 font-semibold mt-0.5"></p>
+                </div>
+                <div class="flex justify-between sm:justify-end gap-1.5 items-center w-full sm:w-auto overflow-x-auto no-scrollbar">
+                    <div class="flex items-center gap-1.5 mr-1 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 shrink-0">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <p id="online-users" class="text-[10px] font-bold text-emerald-700 truncate max-w-[90px] sm:max-w-[160px]">...</p>
+                    </div>
+                    <button onclick="bukaModal('modal-qris')" class="w-9 h-9 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold hover:bg-teal-50 hover:text-teal-600 flex justify-center items-center shrink-0 shadow-sm" title="QRIS"><i class="fa-solid fa-qrcode"></i></button>
+                    <button onclick="bukaModal('modal-rekap')" class="w-9 h-9 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold hover:bg-purple-50 hover:text-purple-600 flex justify-center items-center shrink-0 shadow-sm" title="Laporan Bulanan"><i class="fa-solid fa-chart-pie"></i></button>
+                    <button onclick="bukaRiwayatSesi()" class="w-9 h-9 bg-white border border-slate-200 text-slate-600 rounded-full text-xs font-bold hover:bg-blue-50 hover:text-blue-600 flex justify-center items-center shrink-0 shadow-sm" title="Histori Hari Ini"><i class="fa-solid fa-receipt"></i></button>
+                    <button onclick="bukaModal('modal-menu')" class="w-9 h-9 bg-slate-800 text-white rounded-full text-xs font-bold hover:bg-indigo-600 flex justify-center items-center shrink-0 shadow-sm" title="Tambah Menu"><i class="fa-solid fa-plus"></i></button>
+                    <button onclick="keluarSesiBersih(false)" class="w-9 h-9 bg-slate-100 text-slate-600 rounded-full text-xs font-bold hover:bg-slate-200 flex justify-center items-center shrink-0" title="Ganti Shift / Keluar"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <button onclick="tutupSesi()" class="px-3 h-9 bg-red-50 text-red-600 border border-red-100 rounded-full text-[11px] font-extrabold hover:bg-red-500 hover:text-white transition-colors shrink-0">VALIDASI PJ</button>
                 </div>
             </div>
-            <div id="menu-container" class="flex-1 overflow-y-auto p-4 sm:p-5 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 content-start no-scrollbar pb-24 md:pb-6"></div>
+            <div id="menu-container" class="flex-1 overflow-y-auto p-3.5 sm:p-5 grid grid-cols-2 lg:grid-cols-3 gap-3 content-start no-scrollbar pb-20 md:pb-6"></div>
         </div>
 
-        <div class="w-full h-[40vh] md:h-full md:w-[360px] lg:w-[420px] bg-white flex flex-col shrink-0 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] z-10">
-            <div class="p-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
-                <h2 class="font-extrabold text-slate-800 text-base tracking-tight"><i class="fa-solid fa-basket-shopping text-indigo-500 mr-2"></i>Keranjang</h2>
-                <span id="cart-badge" class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-black">0</span>
+        <!-- KERANJANG -->
+        <div class="w-full h-[38vh] md:h-full md:w-[350px] lg:w-[400px] bg-white flex flex-col shrink-0 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] z-10">
+            <div class="p-3 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h2 class="font-extrabold text-slate-800 text-sm"><i class="fa-solid fa-basket-shopping text-indigo-500 mr-1.5"></i>Keranjang Pesanan</h2>
+                <span id="cart-badge" class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-0.5 rounded-full font-black">0</span>
             </div>
-            <div id="cart-container" class="flex-1 overflow-y-auto min-h-0 p-3 flex flex-col gap-2.5 no-scrollbar bg-slate-50/50"></div>
-            <div class="p-4 bg-white border-t border-slate-100 shrink-0 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+            <div id="cart-container" class="flex-1 overflow-y-auto min-h-0 p-3 flex flex-col gap-2 no-scrollbar bg-slate-50/50"></div>
+            <div class="p-3.5 bg-white border-t border-slate-100 shrink-0 flex justify-between items-center">
                 <div class="flex flex-col">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Total Tagihan</span>
-                    <span id="cart-total" class="text-xl font-black text-slate-900 leading-none">Rp 0</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Total Tagihan</span>
+                    <span id="cart-total" class="text-lg sm:text-xl font-black text-slate-900 leading-tight">Rp 0</span>
                 </div>
-                <button id="btn-bayar" class="px-8 py-3.5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:shadow-emerald-500/30 disabled:opacity-50 transition-all duration-200">
-                    BAYAR <i class="fa-solid fa-arrow-right ml-1"></i>
+                <button id="btn-bayar" class="px-7 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-2xl shadow-lg hover:opacity-95 disabled:opacity-40 transition-all text-sm">
+                    BAYAR <i class="fa-solid fa-check ml-1"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- SEMUA MODAL DISINI -->
-    
-    <!-- MODAL VALIDASI PJ (SUPER BARU) -->
-    <div id="modal-validasi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl animate-pop flex flex-col max-h-[90vh]">
-            <h2 class="text-xl font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
-                <div class="flex items-center gap-2"><i class="fa-solid fa-user-check text-emerald-500"></i> Validasi Absen</div>
-                <button onclick="tutupModal('modal-validasi')" class="w-8 h-8 bg-slate-100 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+    <!-- MODAL VALIDASI PJ & ABSENSI HARI INI -->
+    <div id="modal-validasi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-md shadow-2xl animate-pop flex flex-col max-h-[90vh]">
+            <h2 class="text-lg font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
+                <span><i class="fa-solid fa-user-shield text-emerald-500 mr-1.5"></i>Validasi Kehadiran PJ</span>
+                <button onclick="tutupModal('modal-validasi')" class="w-8 h-8 bg-slate-100 text-slate-500 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </h2>
-            <p class="text-[11px] text-slate-500 mb-4 shrink-0 border-b border-slate-100 pb-3">Periksa daftar kasir yang absen hari ini. Hapus jika ada anggota fiktif / tidak jaga.</p>
+            <p class="text-[11px] text-slate-500 mb-3 shrink-0">Cek siapa saja yang benar-benar jaga hari ini. PJ bisa menghapus absen fiktif atau menambah anggota yang lupa absen.</p>
             
-            <div id="list-validasi-absensi" class="flex-1 overflow-y-auto no-scrollbar space-y-2 mb-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                <!-- Data absensi masuk sini -->
+            <!-- Tambah Absen Manual oleh PJ -->
+            <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200 mb-3 flex gap-1.5 shrink-0">
+                <select id="pj-add-nama" class="flex-1 p-2 text-xs border rounded-xl font-bold bg-white"></select>
+                <select id="pj-add-shift" class="p-2 text-xs border rounded-xl font-bold bg-white">
+                    <option value="1_Shift 1 (Pagi-Siang)">Shift 1 (1 Poin)</option>
+                    <option value="1_Shift 2 (Siang-Sore)">Shift 2 (1 Poin)</option>
+                    <option value="2_Full Shift (Pagi-Sore)">Full (2 Poin)</option>
+                </select>
+                <button onclick="tambahAbsenOlehPJ()" class="px-3 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700">+ Absen</button>
             </div>
 
-            <button id="btn-konfirmasi-tutup" onclick="konfirmasiTutup()" class="w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all shrink-0">Validasi Sah & Tutup Hari</button>
+            <div id="list-validasi-absensi" class="flex-1 overflow-y-auto no-scrollbar space-y-2 mb-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-100"></div>
+
+            <button id="btn-konfirmasi-tutup" onclick="konfirmasiTutup()" class="w-full py-3.5 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 shadow-lg text-sm shrink-0">
+                Validasi Sah & Kunci Laporan Hari Ini
+            </button>
         </div>
     </div>
 
-    <!-- MODAL REKAP KEUANGAN & GAJI -->
-    <div id="modal-rekap" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <!-- MODAL LAPORAN RENTANG TANGGAL & KOMISI KELOMPOK -->
+    <div id="modal-rekap" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-lg shadow-2xl animate-pop flex flex-col max-h-[90vh]">
-            <h2 class="text-xl font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
-                <div class="flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar text-purple-500"></i> Laporan & Gaji</div>
-                <button onclick="tutupModal('modal-rekap')" class="w-8 h-8 bg-slate-100 text-slate-400 hover:text-red-500 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-lg font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
+                <span><i class="fa-solid fa-file-invoice-dollar text-purple-600 mr-1.5"></i>Laporan Keuangan & Komisi</span>
+                <button onclick="tutupModal('modal-rekap')" class="w-8 h-8 bg-slate-100 text-slate-500 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </h2>
-            <p class="text-xs text-slate-500 mb-4 shrink-0">Pilih rentang tanggal untuk melihat perhitungan komisi per kelompok.</p>
+            <p class="text-[11px] text-slate-500 mb-3 shrink-0">Pilih rentang tanggal (Harian Reguler = 80:20 | Bazar Wisuda = 70:30).</p>
             
-            <div class="flex gap-2 mb-4 shrink-0 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+            <div class="flex gap-2 mb-4 shrink-0 bg-slate-50 p-3 rounded-2xl border border-slate-200">
                 <div class="flex-1">
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase">Dari Tanggal</label>
-                    <input type="date" id="rekap-start" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">Dari Tanggal</label>
+                    <input type="date" id="rekap-start" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700 bg-white">
                 </div>
                 <div class="flex-1">
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase">Sampai Tanggal</label>
-                    <input type="date" id="rekap-end" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">Sampai Tanggal</label>
+                    <input type="date" id="rekap-end" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700 bg-white">
                 </div>
                 <div class="flex items-end">
-                    <button onclick="generateLaporan()" class="h-[34px] px-4 bg-purple-600 text-white font-bold rounded-xl text-xs hover:bg-purple-700 shadow-md">Tarik Data</button>
+                    <button onclick="generateLaporan()" class="h-[34px] px-4 bg-purple-600 text-white font-bold rounded-xl text-xs hover:bg-purple-700 shadow">Hitung</button>
                 </div>
             </div>
 
-            <div id="rekap-result" class="flex-1 overflow-y-auto no-scrollbar space-y-4">
-                <p class="text-center text-slate-400 text-xs italic mt-10">Pilih tanggal lalu klik "Tarik Data"</p>
-            </div>
+            <div id="rekap-result" class="flex-1 overflow-y-auto no-scrollbar space-y-3 pr-1"></div>
         </div>
     </div>
 
     <!-- MODAL QRIS -->
-    <div id="modal-qris" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="modal-qris" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white p-5 rounded-[2rem] w-full max-w-sm shadow-2xl relative flex flex-col items-center animate-pop">
-            <button onclick="tutupModal('modal-qris')" class="absolute top-4 right-5 w-8 h-8 bg-slate-100 text-slate-400 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
-            <div class="w-12 h-12 bg-teal-100 text-teal-500 rounded-full flex items-center justify-center mb-3 text-xl"><i class="fa-solid fa-qrcode"></i></div>
-            <h2 class="text-lg font-extrabold text-slate-800 text-center mb-1">Scan QRIS</h2>
-            <img src="https://raw.githubusercontent.com/melatifood/KedaiKwu/refs/heads/main/Qris.jpg" alt="QRIS" class="w-full h-auto max-h-[50vh] object-contain rounded-2xl border-2 border-dashed mt-3">
+            <button onclick="tutupModal('modal-qris')" class="absolute top-4 right-4 w-8 h-8 bg-slate-100 text-slate-500 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-lg font-extrabold text-slate-800 mb-1">Scan QRIS</h2>
+            <p class="text-xs text-slate-400 mb-3">KasirKwu by Business Center</p>
+            <img src="https://raw.githubusercontent.com/melatifood/KedaiKwu/refs/heads/main/Qris.jpg" alt="QRIS" class="w-full h-auto max-h-[55vh] object-contain rounded-2xl border p-2">
         </div>
     </div>
 
-    <!-- MODAL RIWAYAT -->
-    <div id="modal-riwayat" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- MODAL RIWAYAT HARIAN FULL SEHARIAN -->
+    <div id="modal-riwayat" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl animate-pop">
-            <h2 class="text-xl font-black mb-1 flex justify-between items-center text-slate-800">
-                <div class="flex items-center gap-2"><i class="fa-solid fa-receipt text-blue-500"></i> Riwayat Harian</div>
-                <button onclick="tutupModal('modal-riwayat')" class="w-8 h-8 bg-slate-100 text-slate-400 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-lg font-black mb-1 flex justify-between items-center text-slate-800">
+                <span><i class="fa-solid fa-receipt text-blue-500 mr-1.5"></i>Histori Full Hari Ini</span>
+                <button onclick="tutupModal('modal-riwayat')" class="w-8 h-8 bg-slate-100 text-slate-500 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </h2>
-            <p class="text-[10px] font-medium text-red-400 mb-4">*Tap icon minus (-) jika kasir salah input.</p>
-            <div id="riwayat-items" class="space-y-0 max-h-56 overflow-y-auto bg-slate-50 p-2 rounded-2xl border border-slate-100 pr-3"></div>
-            <div class="mt-4 flex justify-between items-center bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
-                <span class="font-extrabold text-indigo-800 text-xs uppercase tracking-widest">Total Omset Harian</span>
-                <span id="riwayat-total" class="font-black text-indigo-600 text-lg leading-none">Rp 0</span>
+            <p class="text-[10px] font-semibold text-red-400 mb-3">*Klik tombol minus (-) jika salah input jumlah terjual.</p>
+            <div id="riwayat-items" class="space-y-1 max-h-60 overflow-y-auto bg-slate-50 p-3 rounded-2xl border border-slate-100"></div>
+            <div class="mt-4 flex justify-between items-center bg-indigo-50 p-3.5 rounded-2xl border border-indigo-100">
+                <span class="font-extrabold text-indigo-900 text-xs uppercase">Omset Seharian</span>
+                <span id="riwayat-total" class="font-black text-indigo-600 text-base">Rp 0</span>
             </div>
         </div>
     </div>
 
-    <!-- MODAL MENU -->
-    <div id="modal-menu" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <!-- MODAL TAMBAH MENU -->
+    <div id="modal-menu" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl animate-pop">
-            <h2 class="text-xl font-black mb-5 text-slate-800"><i class="fa-solid fa-burger text-indigo-500 mr-2"></i>Menu Baru</h2>
-            <div class="space-y-4">
-                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 ml-1 uppercase">Nama Produk</label><input type="text" id="add-nama" class="w-full p-3 border rounded-2xl text-sm bg-slate-50"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 ml-1 uppercase">Modal (HPP)</label><input type="number" id="add-hpp" class="w-full p-3 border rounded-2xl text-sm bg-slate-50"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 ml-1 uppercase">Harga Jual</label><input type="number" id="add-jual" class="w-full p-3 border rounded-2xl text-sm bg-slate-50"></div>
-                <div class="flex gap-3 pt-3">
+            <h2 class="text-lg font-black mb-4 text-slate-800"><i class="fa-solid fa-burger text-indigo-500 mr-1.5"></i>Tambah Menu Baru</h2>
+            <div class="space-y-3">
+                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Nama Menu</label><input type="text" id="add-nama" class="w-full p-3 border rounded-2xl text-sm bg-slate-50" placeholder="Contoh: Es Kuwut"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Modal / HPP (Rp)</label><input type="number" id="add-hpp" class="w-full p-3 border rounded-2xl text-sm bg-slate-50" placeholder="Contoh: 4000"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Harga Jual (Rp)</label><input type="number" id="add-jual" class="w-full p-3 border rounded-2xl text-sm bg-slate-50" placeholder="Contoh: 7000"></div>
+                <div class="flex gap-2 pt-2">
                     <button onclick="tutupModal('modal-menu')" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl text-sm">Batal</button>
                     <button id="btn-simpan-menu" class="flex-1 py-3 bg-slate-900 text-white font-bold rounded-2xl text-sm">Simpan</button>
                 </div>
@@ -198,50 +202,45 @@
         </div>
     </div>
 
-    <!-- MODAL HASIL SHIFT -->
+    <!-- MODAL HASIL AKHIR HARI -->
     <div id="modal-hasil" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-sm shadow-2xl text-center relative overflow-hidden flex flex-col max-h-[90vh] animate-pop">
-            <div class="bg-red-50 text-red-500 w-max px-4 py-1.5 absolute top-4 left-1/2 -translate-x-1/2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-red-100 shrink-0">AKHIR TUGAS</div>
-            <div class="overflow-y-auto no-scrollbar pt-10 pb-2">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">🎉</div>
-                <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tight">Kerja Bagus!</h2>
-                <p class="text-[11px] text-slate-400 mb-5 font-bold uppercase tracking-wider"><span id="hasil-tanggal"></span> &bull; Ringkasan Harian</p>
+            <div class="bg-emerald-50 text-emerald-600 w-max px-4 py-1 mx-auto mb-2 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-emerald-200">LAPORAN HARIAN SAH</div>
+            <div class="overflow-y-auto no-scrollbar space-y-3">
+                <h2 class="text-xl font-black text-slate-800">Rekap Penutupan Hari 🎉</h2>
+                <p id="hasil-tanggal" class="text-[11px] text-slate-400 font-bold uppercase"></p>
                 
-                <div class="text-left mb-4">
-                    <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 ml-1">Rincian Terjual Hari Ini:</p>
-                    <div id="hasil-items" class="bg-slate-50 p-3 rounded-2xl border border-slate-100 max-h-32 overflow-y-auto"></div>
+                <div class="text-left">
+                    <p class="text-[10px] font-extrabold text-slate-400 uppercase mb-1">Menu Terjual Hari Ini (A-Z):</p>
+                    <div id="hasil-items" class="bg-slate-50 p-3 rounded-2xl border border-slate-100 max-h-28 overflow-y-auto space-y-1"></div>
                 </div>
 
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left space-y-3 mb-4 text-sm font-medium">
-                    <div class="flex justify-between items-center"><span class="text-slate-500">Total Omset Harian</span><span id="hasil-omset" class="font-bold text-slate-800">Rp 0</span></div>
-                    <div class="flex justify-between items-center"><span class="text-slate-500">Total Modal Harian</span><span id="hasil-hpp" class="font-bold text-red-400">Rp 0</span></div>
-                    <div class="w-full h-[1px] bg-slate-200 border-dashed border-t border-slate-200"></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-700">Laba Bersih Harian</span><span id="hasil-kotor" class="font-black text-emerald-500 text-lg">Rp 0</span></div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-left space-y-2 text-xs font-medium">
+                    <div class="flex justify-between"><span>Total Omset Seharian</span><span id="hasil-omset" class="font-bold text-slate-800">Rp 0</span></div>
+                    <div class="flex justify-between"><span>Total Modal (HPP)</span><span id="hasil-hpp" class="font-bold text-red-500">Rp 0</span></div>
+                    <div class="border-t border-dashed border-slate-200 my-1"></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-700">Laba Bersih</span><span id="hasil-kotor" class="font-black text-emerald-600 text-base">Rp 0</span></div>
                 </div>
 
-                <div class="flex gap-3 text-left shrink-0">
-                    <div class="flex-1 bg-emerald-50 p-3 rounded-2xl border border-emerald-100 relative overflow-hidden">
-                        <div class="absolute -right-3 -top-3 text-emerald-100/50 text-4xl"><i class="fa-solid fa-wallet"></i></div>
-                        <p class="text-[9px] font-extrabold text-emerald-600 uppercase tracking-wider relative z-10">Sobat BC (80%)</p>
-                        <p id="hasil-karyawan" class="text-base font-black text-emerald-800 mt-1 relative z-10">Rp 0</p>
+                <div class="flex gap-2.5 text-left">
+                    <div class="flex-1 bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
+                        <p id="label-persen-karyawan" class="text-[9px] font-extrabold text-emerald-700 uppercase">Sobat BC (80%)</p>
+                        <p id="hasil-karyawan" class="text-sm font-black text-emerald-900 mt-0.5">Rp 0</p>
                     </div>
-                    <div class="flex-1 bg-blue-50 p-3 rounded-2xl border border-blue-100 relative overflow-hidden">
-                        <div class="absolute -right-3 -top-3 text-blue-100/50 text-4xl"><i class="fa-solid fa-building"></i></div>
-                        <p class="text-[9px] font-extrabold text-blue-600 uppercase tracking-wider relative z-10">Kas BC (20%)</p>
-                        <p id="hasil-cafe" class="text-base font-black text-blue-800 mt-1 relative z-10">Rp 0</p>
+                    <div class="flex-1 bg-blue-50 p-3 rounded-2xl border border-blue-100">
+                        <p id="label-persen-cafe" class="text-[9px] font-extrabold text-blue-700 uppercase">Kas BC (20%)</p>
+                        <p id="hasil-cafe" class="text-sm font-black text-blue-900 mt-0.5">Rp 0</p>
                     </div>
                 </div>
                 
-                <!-- TANDA TANGAN DIGITAL PJ -->
-                <div class="mt-5 pt-3 border-t border-dashed border-slate-200 text-center">
-                    <p id="hasil-validator" class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest"></p>
+                <div class="pt-2 border-t border-dashed border-slate-200">
+                    <p id="hasil-validator" class="text-[10px] font-extrabold text-slate-500 uppercase"></p>
                 </div>
             </div>
-            <button onclick="keluarSesiBersih(true)" class="w-full mt-4 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-600 text-sm shadow-xl">Keluar Sistem</button>
+            <button onclick="keluarSesiBersih(true)" class="w-full mt-4 py-3.5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-600 text-sm shadow-lg shrink-0">Selesai & Keluar</button>
         </div>
     </div>
 
-    <!-- LOGIKA JAVASCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
@@ -259,137 +258,226 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        const state = { activeSessionDate: null, namaKasir: null, activeShift: null, cart: [], products: [], rawTransactions: [], rekapPenjualan: {}, totalOmset: 0, totalModal: 0 };
-        const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        const state = {
+            activeSessionDate: null,
+            activeKelompok: null,
+            namaKasir: null,
+            activeShift: null,
+            cart: [],
+            products: [],
+            rawTransactions: [],
+            rekapPenjualan: {},
+            totalOmset: 0,
+            totalModal: 0
+        };
+
+        const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(Math.round(num || 0));
 
         const dataKelompok = {
-            "Kelompok 1": ["Arya", "Lulu", "Tika", "danisa", "Ita", "Aida", "Revana", "Dimas"],
-            "Kelompok 2": ["Aura", "Shafa", "Fania", "Gandi", "Rizki", "Zahira", "Addin"],
-            "Kelompok 3": ["Cecilia", "Luthfan", "Asti", "Shena", "Ainun", "Alifa", "Jihan", "Caca"],
-            "Kelompok 4": ["Cica", "Dzakiah", "talita", "Nur jahaba", "Wildan", "nur silvia", "Nadhif"],
-            "Lainnya": ["Kasir Tambahan / Pengganti"]
+            "Kelompok 1": ["Aida", "Arya", "danisa", "Dimas", "Ita", "Lulu", "Revana", "Tika"],
+            "Kelompok 2": ["Addin", "Aura", "Fania", "Gandi", "Rizki", "Shafa", "Zahira"],
+            "Kelompok 3": ["Ainun", "Alifa", "Asti", "Caca", "Cecilia", "Jihan", "Luthfan", "Shena"],
+            "Kelompok 4": ["Cica", "Dzakiah", "Nadhif", "Nur jahaba", "nur silvia", "talita", "Wildan"]
+        };
+
+        const semuaAnggota = [
+            ...dataKelompok["Kelompok 1"],
+            ...dataKelompok["Kelompok 2"],
+            ...dataKelompok["Kelompok 3"],
+            ...dataKelompok["Kelompok 4"]
+        ].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+
+        dataKelompok["Bazar Wisuda"] = semuaAnggota;
+
+        const pjPerKelompok = {
+            "Kelompok 1": "Dimas",
+            "Kelompok 2": "Addin",
+            "Kelompok 3": "Caca",
+            "Kelompok 4": "Nadhif"
         };
 
         const inputTanggal = document.getElementById('input-tanggal');
         const inputKelompok = document.getElementById('input-kelompok');
         const inputNama = document.getElementById('input-nama');
 
-        inputTanggal.value = new Date().toISOString().split('T')[0];
-        
-        function updateDropdownNama() {
-            const hariIni = new Date(inputTanggal.value).getDay(); 
-            if (hariIni === 1) inputKelompok.value = "Kelompok 1";
-            else if (hariIni === 2) inputKelompok.value = "Kelompok 2";
-            else if (hariIni === 3) inputKelompok.value = "Kelompok 3";
-            else if (hariIni === 4) inputKelompok.value = "Kelompok 4";
-            else inputKelompok.value = "Lainnya";
-            renderListNama();
+        const todayStr = new Date().toISOString().split('T')[0];
+        inputTanggal.value = todayStr;
+        document.getElementById('rekap-start').value = todayStr;
+        document.getElementById('rekap-end').value = todayStr;
+
+        function pilihKelompokOtomatis() {
+            const d = new Date(inputTanggal.value + "T00:00:00").getDay();
+            if (d === 1) inputKelompok.value = "Kelompok 1";
+            else if (d === 2) inputKelompok.value = "Kelompok 2";
+            else if (d === 3) inputKelompok.value = "Kelompok 3";
+            else if (d === 4) inputKelompok.value = "Kelompok 4";
+            else inputKelompok.value = "Bazar Wisuda";
+            renderDropdownNama();
         }
 
-        function renderListNama() {
+        function renderDropdownNama() {
             const klp = inputKelompok.value;
-            inputNama.innerHTML = dataKelompok[klp].map(n => `<option value="${n}">${n}</option>`).join('');
-            if(klp === "Lainnya") { inputNama.innerHTML = `<option value="Sobat BC 1">Sobat BC 1</option><option value="Sobat BC 2">Sobat BC 2</option>`; }
+            const list = [...(dataKelompok[klp] || semuaAnggota)].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+            const optionsHtml = list.map(n => `<option value="${n}">${n}</option>`).join('');
+            inputNama.innerHTML = optionsHtml;
+            document.getElementById('pj-add-nama').innerHTML = optionsHtml;
         }
 
-        inputTanggal.addEventListener('change', updateDropdownNama);
-        inputKelompok.addEventListener('change', renderListNama);
-        updateDropdownNama();
+        inputTanggal.addEventListener('change', pilihKelompokOtomatis);
+        inputKelompok.addEventListener('change', renderDropdownNama);
+        pilihKelompokOtomatis();
 
         function showToast(msg, type) {
             const container = document.getElementById('toast-container');
             const el = document.createElement('div');
-            el.className = `px-5 py-3 rounded-2xl shadow-xl font-bold text-white text-xs tracking-wide transform transition-all duration-300 translate-y-0 opacity-100 flex items-center gap-2 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
+            el.className = `px-4 py-3 rounded-2xl shadow-xl font-bold text-white text-xs flex items-center gap-2 transition-all duration-300 ${type === 'error' ? 'bg-red-500' : 'bg-slate-800'}`;
             el.innerHTML = type === 'error' ? `<i class="fa-solid fa-circle-exclamation"></i> ${msg}` : `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
             container.appendChild(el);
-            setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-10px)'; setTimeout(() => el.remove(), 300); }, 3000);
+            setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
         }
 
         window.bukaModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
 
-        // 1. LOGIN & CATAT ABSENSI
+        // 1. LOGIN & ABSENSI HARIAN
         document.getElementById('btn-login').addEventListener('click', async () => {
-            const tanggal = inputTanggal.value; const kelompok = inputKelompok.value; const nama = inputNama.value;
+            const tanggal = inputTanggal.value;
+            const kelompok = inputKelompok.value;
+            const nama = inputNama.value;
             const shiftVal = document.getElementById('input-shift').value;
-            const poin = parseInt(shiftVal.split('_')[0]); const shiftNama = shiftVal.split('_')[1];
-            
-            if(!nama || !tanggal) return showToast("Lengkapi data absen!", "error");
-            document.getElementById('btn-login').innerText = "Memproses Absen...";
-            
+            const poin = parseInt(shiftVal.split('_')[0]);
+            const shiftNama = shiftVal.split('_')[1];
+
+            if (!nama || !tanggal) return showToast("Pilih tanggal dan nama!", "error");
+            document.getElementById('btn-login').innerText = "Menyimpan Absen...";
+
             try {
                 await signInAnonymously(auth);
-                state.activeSessionDate = tanggal; state.namaKasir = nama; state.activeShift = shiftNama;
-                
-                await setDoc(doc(db, 'attendance', `${tanggal}_${nama}`), { date: tanggal, kelompok: kelompok, nama: nama, shift: shiftNama, poin: poin, timestamp: serverTimestamp() }, { merge: true });
-                
+                state.activeSessionDate = tanggal;
+                state.activeKelompok = kelompok;
+                state.namaKasir = nama;
+                state.activeShift = shiftNama;
+
+                await setDoc(doc(db, 'attendance', `${tanggal}_${kelompok}_${nama}`), {
+                    date: tanggal,
+                    kelompok: kelompok,
+                    nama: nama,
+                    shift: shiftNama,
+                    poin: poin,
+                    timestamp: serverTimestamp()
+                }, { merge: true });
+
                 const sessionRef = doc(db, 'sessions_status', tanggal);
-                await setDoc(sessionRef, { status: 'aktif', kasirAktif: arrayUnion(`${nama} (${shiftNama})`) }, { merge: true });
-                
+                await setDoc(sessionRef, {
+                    status: 'aktif',
+                    kelompok: kelompok,
+                    kasirAktif: arrayUnion(`${nama} (${shiftNama})`)
+                }, { merge: true });
+
                 onSnapshot(sessionRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        if (data.status === 'ditutup') tampilkanModalAkhir(data.validatedBy);
-                        if (data.kasirAktif) document.getElementById('online-users').innerText = data.kasirAktif.join(', ');
+                        if (data.status === 'ditutup') tampilkanModalAkhir(data.validatedBy, data.kelompok);
+                        if (data.kasirAktif) {
+                            document.getElementById('online-users').innerText = data.kasirAktif.length ? data.kasirAktif.join(', ') : 'Online';
+                        }
                     }
                 });
 
                 window.addEventListener('beforeunload', () => {
-                    if(state.activeSessionDate && state.namaKasir) { setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true }); }
+                    if (state.activeSessionDate && state.namaKasir) {
+                        setDoc(doc(db, 'sessions_status', state.activeSessionDate), {
+                            kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`)
+                        }, { merge: true });
+                    }
                 });
 
-                const tanggalIndo = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(new Date(tanggal));
-                document.getElementById('info-sesi').innerHTML = `<i class="fa-regular fa-calendar text-slate-400"></i> ${tanggalIndo}`;
-                document.getElementById('hasil-tanggal').innerText = tanggalIndo;
+                const tanggalIndo = new Intl.DateTimeFormat('id-ID', { dateStyle: 'full' }).format(new Date(tanggal + "T00:00:00"));
+                const infoRasio = kelompok === 'Bazar Wisuda' ? '70:30' : '80:20';
+                document.getElementById('info-sesi').innerText = `${tanggalIndo} • ${nama} (${poin} Poin)`;
+                document.getElementById('badge-mode').innerText = `${kelompok} (${infoRasio})`;
+                document.getElementById('hasil-tanggal').innerText = `${tanggalIndo} •${kelompok}`;
 
                 document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('pos-screen').classList.remove('hidden'); document.getElementById('pos-screen').classList.add('flex');
-                
-                loadMenu(); pantauTransaksiAktif(); 
-                showToast(`Absen berhasil. Semangat, ${nama}!`, "success");
-            } catch (e) { document.getElementById('btn-login').innerText = "Absen & Masuk Sistem"; }
+                document.getElementById('pos-screen').classList.remove('hidden');
+                document.getElementById('pos-screen').classList.add('flex');
+
+                loadMenu();
+                pantauTransaksiAktif();
+                showToast(`Absen tercatat: ${nama} (${poin} Poin)`, "success");
+            } catch (e) {
+                console.error(e);
+                showToast("Gagal terhubung ke server.", "error");
+                document.getElementById('btn-login').innerText = "Absen & Buka Kasir";
+            }
         });
 
         window.keluarSesiBersih = async (isTutupTotal = false) => {
-            if(!isTutupTotal && !confirm("Yakin ingin Keluar/Ganti Kasir?\n(Pilih ini jika mau ganti orang tapi hari belum selesai)")) return;
-            if(state.activeSessionDate && state.namaKasir) { await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`) }, { merge: true }); }
+            if (!isTutupTotal && !confirm("Ingin keluar / ganti akun kasir? (Transaksi hari ini tetap berjalan)")) return;
+            if (state.activeSessionDate && state.namaKasir) {
+                await setDoc(doc(db, 'sessions_status', state.activeSessionDate), {
+                    kasirAktif: arrayRemove(`${state.namaKasir} (${state.activeShift})`)
+                }, { merge: true });
+            }
             location.reload();
         };
 
+        // 2. PANTAU HISTORI TRANSAKSI FULL SEHARIAN
         function pantauTransaksiAktif() {
             const q = query(collection(db, 'transactions'), where('date', '==', state.activeSessionDate));
             onSnapshot(q, (snapshot) => {
-                state.rawTransactions = []; state.rekapPenjualan = {}; state.totalOmset = 0; state.totalModal = 0;
+                state.rawTransactions = [];
+                state.rekapPenjualan = {};
+                state.totalOmset = 0;
+                state.totalModal = 0;
+
                 snapshot.forEach(docSnap => {
-                    const data = docSnap.data(); state.rawTransactions.push({ id: docSnap.id, ...data });
-                    state.totalOmset += data.omset || 0; state.totalModal += data.modal || 0;
-                    if(data.items) {
+                    const data = docSnap.data();
+                    state.rawTransactions.push({ id: docSnap.id, ...data });
+                    state.totalOmset += data.omset || 0;
+                    state.totalModal += data.modal || 0;
+                    if (data.items) {
                         data.items.forEach(item => {
-                            if(!state.rekapPenjualan[item.nama]) state.rekapPenjualan[item.nama] = { qty: 0, omset: 0, harga: item.harga, hpp: item.hpp };
-                            state.rekapPenjualan[item.nama].qty += item.qty; state.rekapPenjualan[item.nama].omset += (item.harga * item.qty);
+                            if (!state.rekapPenjualan[item.nama]) {
+                                state.rekapPenjualan[item.nama] = { qty: 0, omset: 0, harga: item.harga, hpp: item.hpp };
+                            }
+                            state.rekapPenjualan[item.nama].qty += item.qty;
+                            state.rekapPenjualan[item.nama].omset += (item.harga * item.qty);
                         });
                     }
                 });
-                if(!document.getElementById('modal-riwayat').classList.contains('hidden')) renderIsiRiwayat();
+                if (!document.getElementById('modal-riwayat').classList.contains('hidden')) renderIsiRiwayat();
             });
         }
 
+        // 3. LOAD MENU URUT ABJAD A-Z
         function loadMenu() {
             onSnapshot(collection(db, 'products'), (snapshot) => {
-                state.products = []; const container = document.getElementById('menu-container'); container.innerHTML = '';
+                state.products = [];
+                const container = document.getElementById('menu-container');
+                container.innerHTML = '';
+
                 snapshot.forEach(docSnap => {
-                    const item = { id: docSnap.id, ...docSnap.data() }; state.products.push(item);
+                    state.products.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                state.products.sort((a, b) => (a.nama || '').localeCompare(b.nama || '', 'id', { sensitivity: 'base' }));
+
+                state.products.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = "bg-white p-3.5 sm:p-4 rounded-[1.25rem] shadow-sm border border-slate-100 flex flex-col justify-between h-[120px] sm:h-[130px] hover:shadow-md hover:border-indigo-100 hover:-translate-y-1 transition-all duration-200 relative group cursor-pointer overflow-hidden";
-                    div.onclick = (e) => { if(e.target.tagName !== 'I' && e.target.tagName !== 'BUTTON') window.tambahKeKeranjang(item.id); };
+                    div.className = "bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between h-[118px] hover:border-indigo-200 hover:shadow-md transition-all relative group cursor-pointer";
+                    div.onclick = (e) => { if (e.target.tagName !== 'I' && e.target.tagName !== 'BUTTON') window.tambahKeKeranjang(item.id); };
                     div.innerHTML = `
-                        <div class="flex justify-between items-start z-10 relative">
-                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base leading-tight pr-5">${item.nama}</h3>
-                            <button onclick="event.stopPropagation(); hapusMenu('${item.id}')" class="absolute -top-1 -right-1 w-7 h-7 bg-red-50 text-red-400 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-extrabold text-slate-800 text-xs sm:text-sm leading-snug pr-5">${item.nama}</h3>
+                            <button onclick="event.stopPropagation(); hapusMenu('${item.id}')" class="w-6 h-6 bg-red-50 text-red-400 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><i class="fa-solid fa-trash text-[9px]"></i></button>
                         </div>
-                        <div class="flex justify-between items-end mt-auto z-10 relative">
-                            <div class="flex flex-col"><p class="text-[9px] text-slate-400 font-bold uppercase mb-0.5">M: ${formatIDR(item.hpp)}</p><span class="font-black text-indigo-600 text-sm sm:text-base">${formatIDR(item.harga)}</span></div>
-                            <button onclick="event.stopPropagation(); tambahKeKeranjang('${item.id}')" class="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-full font-black hover:bg-indigo-500 hover:text-white transition-colors flex items-center justify-center"><i class="fa-solid fa-plus text-xs"></i></button>
+                        <div class="flex justify-between items-end mt-auto">
+                            <div>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">HPP: ${formatIDR(item.hpp)}</p>
+                                <span class="font-black text-indigo-600 text-sm">${formatIDR(item.harga)}</span>
+                            </div>
+                            <button onclick="event.stopPropagation(); tambahKeKeranjang('${item.id}')" class="bg-indigo-50 text-indigo-600 w-8 h-8 rounded-full font-black hover:bg-indigo-600 hover:text-white flex items-center justify-center"><i class="fa-solid fa-plus text-xs"></i></button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -398,228 +486,242 @@
         }
 
         document.getElementById('btn-simpan-menu').addEventListener('click', async () => {
-            const nama = document.getElementById('add-nama').value; const hpp = parseInt(document.getElementById('add-hpp').value); const harga = parseInt(document.getElementById('add-jual').value);
-            if(!nama || !hpp || !harga) return showToast("Lengkapi form menu!", "error");
+            const nama = document.getElementById('add-nama').value.trim();
+            const hpp = parseInt(document.getElementById('add-hpp').value);
+            const harga = parseInt(document.getElementById('add-jual').value);
+            if (!nama || isNaN(hpp) || isNaN(harga)) return showToast("Isi nama, HPP, dan harga jual!", "error");
             document.getElementById('btn-simpan-menu').innerText = "Menyimpan...";
             await addDoc(collection(db, 'products'), { nama, hpp, harga });
-            document.getElementById('add-nama').value = ''; document.getElementById('add-hpp').value = ''; document.getElementById('add-jual').value = '';
-            tutupModal('modal-menu'); document.getElementById('btn-simpan-menu').innerText = "Simpan";
+            document.getElementById('add-nama').value = '';
+            document.getElementById('add-hpp').value = '';
+            document.getElementById('add-jual').value = '';
+            tutupModal('modal-menu');
+            document.getElementById('btn-simpan-menu').innerText = "Simpan";
+            showToast("Menu ditambahkan!", "success");
         });
 
-        window.hapusMenu = async (id) => { if(confirm("Hapus menu ini permanen?")) await deleteDoc(doc(db, 'products', id)); };
+        window.hapusMenu = async (id) => {
+            if (confirm("Hapus menu ini dari daftar?")) await deleteDoc(doc(db, 'products', id));
+        };
 
+        // 4. KERANJANG & PEMBAYARAN
         window.tambahKeKeranjang = (id) => {
-            const produk = state.products.find(p => p.id === id); const ada = state.cart.find(c => c.id === id);
-            if(ada) { ada.qty++; } else { state.cart.push({...produk, qty: 1}); }
+            const produk = state.products.find(p => p.id === id);
+            const ada = state.cart.find(c => c.id === id);
+            if (ada) ada.qty++; else state.cart.push({ ...produk, qty: 1 });
             renderKeranjang();
         };
 
         window.kurangiKeranjang = (id) => {
-            const index = state.cart.findIndex(c => c.id === id);
-            if(state.cart[index].qty > 1) { state.cart[index].qty--; } else { state.cart.splice(index, 1); }
+            const idx = state.cart.findIndex(c => c.id === id);
+            if (idx === -1) return;
+            if (state.cart[idx].qty > 1) state.cart[idx].qty--; else state.cart.splice(idx, 1);
             renderKeranjang();
         };
 
         function renderKeranjang() {
-            const container = document.getElementById('cart-container'); container.innerHTML = ''; let total = 0; let totalItem = 0;
+            const container = document.getElementById('cart-container');
+            container.innerHTML = '';
+            let total = 0, totalItem = 0;
+
             state.cart.forEach(item => {
-                total += (item.harga * item.qty); totalItem += item.qty;
+                total += item.harga * item.qty;
+                totalItem += item.qty;
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-white border border-slate-100 rounded-2xl shadow-sm shrink-0";
+                div.className = "flex justify-between items-center p-2.5 bg-white border border-slate-100 rounded-2xl shadow-sm shrink-0";
                 div.innerHTML = `
-                    <div class="flex-1 truncate pr-2"><h4 class="font-bold text-xs text-slate-800 truncate leading-none mb-1">${item.nama}</h4><span class="text-[11px] font-semibold text-indigo-500">${formatIDR(item.harga)}</span></div>
-                    <div class="flex items-center gap-2.5 bg-slate-50 rounded-full border border-slate-100 p-1 shrink-0">
-                        <button onclick="kurangiKeranjang('${item.id}')" class="w-6 h-6 bg-white rounded-full shadow-sm text-slate-400 hover:text-red-500 font-bold flex justify-center items-center"><i class="fa-solid fa-minus text-[8px]"></i></button>
-                        <span class="font-bold text-xs w-3 text-center text-slate-700">${item.qty}</span>
-                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-6 h-6 bg-white rounded-full shadow-sm text-slate-400 hover:text-indigo-500 font-bold flex justify-center items-center"><i class="fa-solid fa-plus text-[8px]"></i></button>
+                    <div class="flex-1 truncate pr-2">
+                        <h4 class="font-bold text-xs text-slate-800 truncate">${item.nama}</h4>
+                        <span class="text-[10px] font-semibold text-indigo-500">${formatIDR(item.harga)}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-50 rounded-full border border-slate-200 p-1 shrink-0">
+                        <button onclick="kurangiKeranjang('${item.id}')" class="w-6 h-6 bg-white rounded-full shadow-sm text-red-500 font-bold flex justify-center items-center"><i class="fa-solid fa-minus text-[8px]"></i></button>
+                        <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
+                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-6 h-6 bg-white rounded-full shadow-sm text-indigo-600 font-bold flex justify-center items-center"><i class="fa-solid fa-plus text-[8px]"></i></button>
                     </div>
                 `;
                 container.appendChild(div);
             });
-            if(state.cart.length === 0) container.innerHTML = `<div class="text-center text-slate-300 mt-10"><i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i><br><span class="text-xs font-semibold uppercase tracking-wider">Keranjang Kosong</span></div>`;
-            document.getElementById('cart-total').innerText = formatIDR(total); document.getElementById('cart-badge').innerText = totalItem; document.getElementById('btn-bayar').disabled = state.cart.length === 0;
+
+            if (state.cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-300 my-auto py-6"><i class="fa-solid fa-basket-shopping text-3xl mb-2 opacity-50"></i><br><span class="text-[11px] font-bold uppercase">Keranjang Kosong</span></div>`;
+            }
+            document.getElementById('cart-total').innerText = formatIDR(total);
+            document.getElementById('cart-badge').innerText = totalItem;
+            document.getElementById('btn-bayar').disabled = state.cart.length === 0;
         }
 
         document.getElementById('btn-bayar').addEventListener('click', async () => {
-            if(state.cart.length === 0) return;
-            const btn = document.getElementById('btn-bayar'); btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+            if (state.cart.length === 0) return;
+            const btn = document.getElementById('btn-bayar');
+            btn.disabled = true;
+            btn.innerText = "Proses...";
             try {
-                let omset = 0; let modal = 0;
-                state.cart.forEach(item => { omset += (item.harga * item.qty); modal += (item.hpp * item.qty); });
-                await addDoc(collection(db, 'transactions'), { date: state.activeSessionDate, items: state.cart, omset: omset, modal: modal, timestamp: serverTimestamp(), kasir: state.namaKasir });
-                state.cart = []; renderKeranjang(); showToast("Pembayaran Sukses!", "success");
-            } catch (error) { showToast("Gagal memproses transaksi", "error"); } 
-            finally { btn.disabled = state.cart.length === 0; btn.innerHTML = `BAYAR <i class="fa-solid fa-arrow-right ml-1"></i>`; }
+                let omset = 0, modal = 0;
+                state.cart.forEach(item => { omset += item.harga * item.qty; modal += item.hpp * item.qty; });
+                await addDoc(collection(db, 'transactions'), {
+                    date: state.activeSessionDate,
+                    kelompok: state.activeKelompok,
+                    items: state.cart,
+                    omset: omset,
+                    modal: modal,
+                    kasir: state.namaKasir,
+                    shift: state.activeShift,
+                    timestamp: serverTimestamp()
+                });
+                state.cart = [];
+                renderKeranjang();
+                showToast("Transaksi Berhasil!", "success");
+            } catch (e) {
+                showToast("Gagal menyimpan transaksi", "error");
+            } finally {
+                btn.disabled = state.cart.length === 0;
+                btn.innerHTML = `BAYAR <i class="fa-solid fa-check ml-1"></i>`;
+            }
         });
 
+        // 5. KOREKSI RIWAYAT HARIAN
         window.koreksiRiwayat = async (namaMenu) => {
-            if(!confirm(`Hapus 1x pesanan "${namaMenu}" dari pendapatan harian?`)) return;
+            if (!confirm(`Kurangi 1x "${namaMenu}" dari histori penjualan hari ini?`)) return;
             const targetTx = [...state.rawTransactions].reverse().find(t => t.items && t.items.some(i => i.nama === namaMenu && i.qty > 0));
-            if(!targetTx) return showToast("Pesanan gagal dilacak", "error");
+            if (!targetTx) return showToast("Data transaksi tidak ditemukan", "error");
             try {
-                const itemIndex = targetTx.items.findIndex(i => i.nama === namaMenu && i.qty > 0);
-                const targetItem = targetTx.items[itemIndex]; const hargaSatuan = targetItem.harga || 0; const hppSatuan = targetItem.hpp || 0;
-                if (targetTx.items.length === 1 && targetItem.qty === 1) { await deleteDoc(doc(db, 'transactions', targetTx.id)); } 
-                else {
-                    const updatedItems = [...targetTx.items];
-                    if (targetItem.qty > 1) { updatedItems[itemIndex] = { ...targetItem, qty: targetItem.qty - 1 }; } else { updatedItems.splice(itemIndex, 1); }
-                    await updateDoc(doc(db, 'transactions', targetTx.id), { items: updatedItems, omset: (targetTx.omset || 0) - hargaSatuan, modal: (targetTx.modal || 0) - hppSatuan });
+                const idx = targetTx.items.findIndex(i => i.nama === namaMenu && i.qty > 0);
+                const item = targetTx.items[idx];
+                if (targetTx.items.length === 1 && item.qty === 1) {
+                    await deleteDoc(doc(db, 'transactions', targetTx.id));
+                } else {
+                    const updated = [...targetTx.items];
+                    if (item.qty > 1) updated[idx] = { ...item, qty: item.qty - 1 };
+                    else updated.splice(idx, 1);
+                    await updateDoc(doc(db, 'transactions', targetTx.id), {
+                        items: updated,
+                        omset: (targetTx.omset || 0) - (item.harga || 0),
+                        modal: (targetTx.modal || 0) - (item.hpp || 0)
+                    });
                 }
-                showToast("1x pesanan dibatalkan", "success");
-            } catch (err) { showToast("Gagal mengubah data server", "error"); }
+                showToast("1x pesanan dikurangi", "success");
+            } catch (e) {
+                showToast("Gagal mengoreksi", "error");
+            }
         };
 
         function renderIsiRiwayat() {
             let html = '';
-            for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
-                if (data.qty > 0) {
-                    html += `<div class="flex justify-between items-center border-b border-dashed border-slate-200 py-3 last:border-0 group">
-                        <div class="flex items-center gap-3">
-                            <button onclick="koreksiRiwayat(decodeURIComponent('${encodeURIComponent(nama)}'))" class="w-7 h-7 bg-white border border-slate-200 text-slate-400 rounded-full flex justify-center items-center hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors shadow-sm" title="Kurangi pesanan"><i class="fa-solid fa-minus text-[10px]"></i></button>
-                            <div class="flex flex-col"><span class="text-xs font-bold text-slate-700">${nama}</span><span class="text-[10px] font-bold text-indigo-500 mt-0.5">x${data.qty}</span></div>
+            const sortedNames = Object.keys(state.rekapPenjualan).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+            for (const nama of sortedNames) {
+                const d = state.rekapPenjualan[nama];
+                if (d.qty > 0) {
+                    html += `<div class="flex justify-between items-center border-b border-dashed border-slate-200 py-2.5 last:border-0">
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="koreksiRiwayat(decodeURIComponent('${encodeURIComponent(nama)}'))" class="w-6 h-6 bg-red-50 text-red-500 rounded-full flex justify-center items-center hover:bg-red-500 hover:text-white"><i class="fa-solid fa-minus text-[9px]"></i></button>
+                            <span class="text-xs font-bold text-slate-700">${nama} <span class="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded ml-1">x${d.qty}</span></span>
                         </div>
-                        <span class="text-xs font-black text-slate-800">${formatIDR(data.omset)}</span>
+                        <span class="text-xs font-black text-slate-800">${formatIDR(d.omset)}</span>
                     </div>`;
                 }
             }
-            document.getElementById('riwayat-items').innerHTML = html || '<p class="text-slate-400 italic text-center text-xs mt-6 mb-2">Belum ada penjualan hari ini.</p>';
+            document.getElementById('riwayat-items').innerHTML = html || '<p class="text-slate-400 italic text-center text-xs py-4">Belum ada transaksi hari ini.</p>';
             document.getElementById('riwayat-total').innerText = formatIDR(state.totalOmset);
         }
 
         window.bukaRiwayatSesi = () => { renderIsiRiwayat(); bukaModal('modal-riwayat'); };
 
+        // 6. LAPORAN RENTANG TANGGAL & PEMBAGIAN KOMISI (REGULER 80:20 | BAZAR 70:30)
         window.generateLaporan = async () => {
-            const start = document.getElementById('rekap-start').value; const end = document.getElementById('rekap-end').value; const resContainer = document.getElementById('rekap-result');
-            if(!start || !end) return showToast("Pilih tanggal awal & akhir!", "error");
-            if(start > end) return showToast("Tanggal akhir harus lebih besar!", "error");
+            const start = document.getElementById('rekap-start').value;
+            const end = document.getElementById('rekap-end').value;
+            const resContainer = document.getElementById('rekap-result');
+            if (!start || !end || start > end) return showToast("Rentang tanggal tidak valid!", "error");
 
-            resContainer.innerHTML = '<div class="flex justify-center py-6"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-purple-500"></i></div>';
+            resContainer.innerHTML = '<div class="text-center py-6 text-xs text-slate-400 font-bold">Menghitung pembagian komisi...</div>';
             try {
-                const trxSnap = await getDocs(collection(db, 'transactions')); const labaHarian = {};
-                trxSnap.forEach(doc => {
-                    const data = doc.data();
-                    if(data.date >= start && data.date <= end) {
-                        if(!labaHarian[data.date]) labaHarian[data.date] = 0;
-                        labaHarian[data.date] += (data.omset - data.modal) * 0.8;
-                    }
+                const [trxSnap, attSnap] = await Promise.all([
+                    getDocs(collection(db, 'transactions')),
+                    getDocs(collection(db, 'attendance'))
+                ]);
+
+                const mapTanggalKeKelompok = {};
+                attSnap.forEach(d => {
+                    const a = d.data();
+                    if (a.date && a.kelompok) mapTanggalKeKelompok[a.date] = a.kelompok;
                 });
 
-                const attSnap = await getDocs(collection(db, 'attendance')); const statsKelompok = {}; const hariSudahDihitung = new Set();
-                attSnap.forEach(doc => {
-                    const a = doc.data();
-                    if(a.date >= start && a.date <= end) {
-                        if(!statsKelompok[a.kelompok]) statsKelompok[a.kelompok] = { totalGaji: 0, totalPoin: 0, anggota: {} };
-                        if(!statsKelompok[a.kelompok].anggota[a.nama]) statsKelompok[a.kelompok].anggota[a.nama] = 0;
-                        statsKelompok[a.kelompok].anggota[a.nama] += a.poin; statsKelompok[a.kelompok].totalPoin += a.poin;
-                        if(!hariSudahDihitung.has(a.date)) { hariSudahDihitung.add(a.date); if(labaHarian[a.date]) statsKelompok[a.kelompok].totalGaji += labaHarian[a.date]; }
+                const statsKelompok = {};
+                let grandOmset = 0, grandKomisi = 0, grandKasBC = 0;
+
+                const ensureKelompok = (klp) => {
+                    if (!statsKelompok[klp]) {
+                        statsKelompok[klp] = { omset: 0, labaKotor: 0, totalKomisi: 0, kasBC: 0, totalPoin: 0, anggota: {}, rincianHari: {} };
                     }
-                });
+                };
 
-                let html = '';
-                if(Object.keys(statsKelompok).length === 0) { resContainer.innerHTML = `<p class="text-center text-slate-400 text-xs italic mt-4">Tidak ada data di tanggal tersebut.</p>`; return; }
-
-                for (const [namaKlp, dataKlp] of Object.entries(statsKelompok)) {
-                    const hargaPerPoin = dataKlp.totalPoin > 0 ? dataKlp.totalGaji / dataKlp.totalPoin : 0;
-                    html += `
-                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-3">
-                        <div class="flex justify-between items-end border-b border-slate-200 pb-2 mb-3">
-                            <div><h3 class="font-black text-slate-800 text-sm">${namaKlp}</h3><p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Poin: ${dataKlp.totalPoin}</p></div>
-                            <div class="text-right"><p class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mb-0.5">Total Gaji Kelompok</p><p class="font-black text-emerald-600 text-lg leading-none">${formatIDR(dataKlp.totalGaji)}</p></div>
-                        </div>
-                        <div class="space-y-2">`;
-                        for(const [namaOrang, poinOrang] of Object.entries(dataKlp.anggota)) {
-                            const gajiOrang = poinOrang * hargaPerPoin;
-                            html += `<div class="flex justify-between items-center text-xs"><span class="text-slate-600 font-bold">${namaOrang} <span class="bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded ml-1 text-[9px]">${poinOrang} Poin</span></span><span class="font-black text-slate-800">${formatIDR(gajiOrang)}</span></div>`;
+                // Hitung laba: Reguler (80:20) vs Bazar Wisuda (70:30)
+                trxSnap.forEach(d => {
+                    const tx = d.data();
+                    if (tx.date >= start && tx.date <= end) {
+                        let klp = tx.kelompok || mapTanggalKeKelompok[tx.date];
+                        if (!klp) {
+                            const dayNum = new Date(tx.date + "T00:00:00").getDay();
+                            klp = dayNum === 1 ? "Kelompok 1" : dayNum === 2 ? "Kelompok 2" : dayNum === 3 ? "Kelompok 3" : dayNum === 4 ? "Kelompok 4" : "Bazar Wisuda";
                         }
-                    html += `</div></div>`;
+                        ensureKelompok(klp);
+                        const omset = tx.omset || 0;
+                        const laba = omset - (tx.modal || 0);
+
+                        const rasioKaryawan = klp === "Bazar Wisuda" ? 0.7 : 0.8;
+                        const rasioKasBC = klp === "Bazar Wisuda" ? 0.3 : 0.2;
+
+                        const jatahKomisi = laba * rasioKaryawan;
+                        const jatahKasBC = laba * rasioKasBC;
+
+                        grandOmset += omset;
+                        grandKomisi += jatahKomisi;
+                        grandKasBC += jatahKasBC;
+
+                        statsKelompok[klp].omset += omset;
+                        statsKelompok[klp].labaKotor += laba;
+                        statsKelompok[klp].totalKomisi += jatahKomisi;
+                        statsKelompok[klp].kasBC += jatahKasBC;
+
+                        if (!statsKelompok[klp].rincianHari[tx.date]) statsKelompok[klp].rincianHari[tx.date] = 0;
+                        statsKelompok[klp].rincianHari[tx.date] += jatahKomisi;
+                    }
+                });
+
+                // Hitung Poin Absensi tiap orang di masing-masing kelompok
+                attSnap.forEach(d => {
+                    const a = d.data();
+                    if (a.date >= start && a.date <= end) {
+                        const klp = a.kelompok || "Bazar Wisuda";
+                        ensureKelompok(klp);
+                        if (!statsKelompok[klp].anggota[a.nama]) statsKelompok[klp].anggota[a.nama] = 0;
+                        statsKelompok[klp].anggota[a.nama] += (a.poin || 1);
+                        statsKelompok[klp].totalPoin += (a.poin || 1);
+                    }
+                });
+
+                if (Object.keys(statsKelompok).length === 0) {
+                    resContainer.innerHTML = '<p class="text-center text-slate-400 text-xs italic py-6">Belum ada data transaksi atau absensi pada rentang tanggal ini.</p>';
+                    return;
                 }
-                resContainer.innerHTML = html;
-            } catch (err) { resContainer.innerHTML = '<p class="text-center text-red-500 text-xs">Gagal menarik data dari server.</p>'; }
-        };
 
-        // ===============================================
-        // 8. LOGIKA VALIDASI OTORISASI PJ (TUTUP HARI)
-        // ===============================================
-        window.tutupSesi = async () => {
-            const dateObj = new Date(state.activeSessionDate);
-            const day = dateObj.getDay(); 
-            
-            let pjHarus = null;
-            if (day === 1) pjHarus = "Dimas";
-            else if (day === 2) pjHarus = "Addin";
-            else if (day === 3) pjHarus = "Caca";
-            else if (day === 4) pjHarus = "Nadhif";
-
-            if (pjHarus && state.namaKasir.toLowerCase() !== pjHarus.toLowerCase()) {
-                return showToast(`Akses Ditolak! Hanya PJ (${pjHarus}) yang berhak menutup hari.`, "error");
-            }
-
-            // Kalau dia beneran PJ, buka Jendela Validasi Absen
-            document.getElementById('list-validasi-absensi').innerHTML = '<div class="flex justify-center p-4"><i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-2xl"></i></div>';
-            bukaModal('modal-validasi');
-
-            try { await muatDaftarAbsensi(); } catch (e) { showToast("Gagal memuat daftar absen", "error"); }
-        };
-
-        window.muatDaftarAbsensi = async () => {
-            const q = query(collection(db, 'attendance'), where('date', '==', state.activeSessionDate));
-            const attSnap = await getDocs(q);
-            let html = '';
-            attSnap.forEach(docSnap => {
-                const data = docSnap.data();
-                html += `
-                <div class="flex justify-between items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
-                    <div>
-                        <p class="text-xs font-extrabold text-slate-800">${data.nama}</p>
-                        <p class="text-[10px] text-slate-400 font-medium">${data.shift} &bull; <span class="text-indigo-500 font-bold">${data.poin} Poin</span></p>
-                    </div>
-                    <button onclick="hapusAbsensiValidasi('${docSnap.id}', '${data.nama}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Hapus absen fiktif"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                let html = `
+                <div class="bg-slate-900 text-white p-4 rounded-2xl grid grid-cols-3 gap-2 text-center">
+                    <div><p class="text-[9px] text-slate-400 uppercase font-bold">Total Omset</p><p class="text-xs sm:text-sm font-black mt-0.5">${formatIDR(grandOmset)}</p></div>
+                    <div><p class="text-[9px] text-emerald-400 uppercase font-bold">Total Komisi</p><p class="text-xs sm:text-sm font-black text-emerald-400 mt-0.5">${formatIDR(grandKomisi)}</p></div>
+                    <div><p class="text-[9px] text-cyan-400 uppercase font-bold">Total Kas BC</p><p class="text-xs sm:text-sm font-black text-cyan-400 mt-0.5">${formatIDR(grandKasBC)}</p></div>
                 </div>`;
-            });
-            if(!html) html = '<p class="text-xs text-center text-slate-400 italic p-3">Belum ada data absen masuk.</p>';
-            document.getElementById('list-validasi-absensi').innerHTML = html;
-        };
 
-        window.hapusAbsensiValidasi = async (docId, namaOrang) => {
-            if(!confirm(`Hapus absen atas nama ${namaOrang}?\n(Poin gajinya akan hangus dan tidak bisa dikembalikan)`)) return;
-            await deleteDoc(doc(db, 'attendance', docId));
-            showToast("Satu absensi dianulir", "success");
-            await muatDaftarAbsensi(); // refresh list absen seketika
-        };
+                const urutanKlp = ["Kelompok 1", "Kelompok 2", "Kelompok 3", "Kelompok 4", "Bazar Wisuda"];
+                const totalGabunganPerOrang = {};
 
-        window.konfirmasiTutup = async () => {
-            if(!confirm("Validasi selesai? Semua kasir akan dikeluarkan secara paksa dan transaksi hari ini dikunci.")) return;
-            document.getElementById('btn-konfirmasi-tutup').innerText = "Mengunci Sistem...";
-            await setDoc(doc(db, 'sessions_status', state.activeSessionDate), { status: 'ditutup', validatedBy: state.namaKasir }, { merge: true });
-            tutupModal('modal-validasi');
-            document.getElementById('btn-konfirmasi-tutup').innerText = "Validasi Sah & Tutup Hari";
-        };
+                urutanKlp.forEach(namaKlp => {
+                    if (!statsKelompok[namaKlp]) return;
+                    const dataKlp = statsKelompok[namaKlp];
+                    const nilaiPerPoin = dataKlp.totalPoin > 0 ? (dataKlp.totalKomisi / dataKlp.totalPoin) : 0;
+                    const isBazar = namaKlp === 'Bazar Wisuda';
+                    const labelPersen = isBazar ? 'Komisi 70%' : 'Komisi 80%';
 
-        function tampilkanModalAkhir(validatorName = state.namaKasir) {
-            const labaKotor = state.totalOmset - state.totalModal;
-            let itemsHtml = '';
-            for (const [nama, data] of Object.entries(state.rekapPenjualan)) {
-                if (data.qty > 0) {
-                    itemsHtml += `<div class="flex justify-between items-center text-xs border-b border-dashed border-slate-200 py-2 last:border-0">
-                        <span class="text-slate-600 font-medium">${nama} <span class="text-[10px] font-bold text-slate-400 bg-white px-1.5 py-0.5 rounded shadow-sm border border-slate-100 ml-1">x${data.qty}</span></span>
-                        <span class="font-bold text-slate-800">${formatIDR(data.omset)}</span>
-                    </div>`;
-                }
-            }
-            document.getElementById('hasil-items').innerHTML = itemsHtml || '<p class="text-slate-400 italic text-[10px] text-center my-2">Belum ada penjualan hari ini.</p>';
-
-            document.getElementById('hasil-omset').innerText = formatIDR(state.totalOmset);
-            document.getElementById('hasil-hpp').innerText = formatIDR(state.totalModal);
-            document.getElementById('hasil-kotor').innerText = formatIDR(labaKotor);
-            document.getElementById('hasil-karyawan').innerText = formatIDR(labaKotor * 0.8);
-            document.getElementById('hasil-cafe').innerText = formatIDR(labaKotor * 0.2);
-            
-            // Masukin stempel siapa yang validasi
-            document.getElementById('hasil-validator').innerHTML = `<i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> DIVALIDASI OLEH: <span class="text-slate-600 font-black">${validatorName || '-'}</span>`;
-            
-            bukaModal('modal-hasil');
-        }
-        window.tampilkanModalAkhir = tampilkanModalAkhir;
-    </script>
-</body>
-</html>
+                    const listHariHtml = Object.entries(dataKlp.rincianHari).sort().map(([tgl, nominal]) => 
+                        `<span class="bg-white border border-slate-200 px-2 py-0.5 rounded-lg text-[10px] font-bold text-slate-6
