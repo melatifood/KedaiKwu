@@ -169,14 +169,14 @@
         </div>
     </div>
 
-    <!-- MODAL LAPORAN RENTANG TANGGAL, POIN, DAN RINCIAN KOMISI PER KELOMPOK -->
+    <!-- MODAL LAPORAN RENTANG TANGGAL, POIN, DAN RINCIAN KOMISI -->
     <div id="modal-rekap" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white p-6 rounded-[2rem] w-full max-w-xl shadow-2xl animate-pop flex flex-col max-h-[90vh]">
             <h2 class="text-lg font-black mb-1 flex justify-between items-center text-slate-800 shrink-0">
                 <span><i class="fa-solid fa-file-invoice-dollar text-purple-600 mr-1.5"></i>Laporan Keuangan & Komisi</span>
                 <button onclick="tutupModal('modal-rekap')" class="w-8 h-8 bg-slate-100 text-slate-500 hover:text-red-500 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </h2>
-            <p class="text-[11px] text-slate-500 mb-3 shrink-0">Laporan dikelompokkan per kelompok & Bazar Wisuda. Anda dapat mengedit poin langsung pada daftar anggota.</p>
+            <p class="text-[11px] text-slate-500 mb-3 shrink-0">Komisi piket Kelompok 1–4 disatukan rata per poin (80:20), sedangkan Bazar Wisuda terpisah (70:30).</p>
             <div class="flex gap-2 mb-4 shrink-0 bg-slate-50 p-3 rounded-2xl border border-slate-200">
                 <div class="flex-1"><label class="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">Dari Tanggal</label><input type="date" id="rekap-start" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700 bg-white"></div>
                 <div class="flex-1"><label class="block text-[9px] font-bold text-slate-400 uppercase mb-0.5">Sampai Tanggal</label><input type="date" id="rekap-end" class="w-full p-2 text-xs border rounded-xl font-bold text-slate-700 bg-white"></div>
@@ -467,7 +467,7 @@
         }
         window.bukaRiwayatSesi = () => { renderIsiRiwayat(); window.bukaModal('modal-riwayat'); };
 
-        // EDIT & ADJUST POIN LANGSUNG DARI LAPORAN PER KELOMPOK
+        // EDIT & ADJUST POIN LANGSUNG DARI LAPORAN
         window.ubahPoinLaporan = async (nama, delta, kelompok) => {
             const start = document.getElementById('rekap-start').value;
             const end = document.getElementById('rekap-end').value;
@@ -526,46 +526,30 @@
             await window.ubahPoinLaporan(nama, selisih, kelompok);
         };
 
-        // GENERATE LAPORAN PER KELOMPOK + RINCIAN TANGGAL JAGA KELOMPOK (OMSET, KOMISI, KAS BC)
+        // GENERATE LAPORAN: KOMISI PIKET KELOMPOK 1-4 DISATUKAN RATA PER POIN (80:20) | BAZAR TERPISAH (70:30)
         window.generateLaporan = async () => {
             const start = document.getElementById('rekap-start').value, end = document.getElementById('rekap-end').value;
             const res = document.getElementById('rekap-result');
             if (!start || !end || start > end) return showToast("Rentang tanggal tidak valid!", "error");
-            res.innerHTML = '<div class="text-center py-6 text-xs text-slate-400 font-bold">Menghitung laporan per kelompok...</div>';
+            res.innerHTML = '<div class="text-center py-6 text-xs text-slate-400 font-bold">Menghitung komisi piket & bazar...</div>';
 
             try {
                 const [trxSnap, attSnap] = await Promise.all([getDocs(collection(db, 'transactions')), getDocs(collection(db, 'attendance'))]);
                 const mapTglKlp = {};
                 attSnap.forEach(d => { const a = d.data(); if (a.date && a.kelompok) mapTglKlp[a.date] = a.kelompok; });
 
-                const urutanKlp = ["Kelompok 1", "Kelompok 2", "Kelompok 3", "Kelompok 4", "Bazar Wisuda"];
+                const kelompokPiket = ["Kelompok 1", "Kelompok 2", "Kelompok 3", "Kelompok 4"];
                 const statsKelompok = {};
-                let gOmset = 0, gKomisi = 0, gKas = 0;
-
-                urutanKlp.forEach(k => {
-                    const isBazar = (k === "Bazar Wisuda");
-                    statsKelompok[k] = {
-                        nama: k,
-                        isBazar,
-                        rasioKar: isBazar ? 0.7 : 0.8,
-                        rasioKas: isBazar ? 0.3 : 0.2,
-                        omset: 0,
-                        modal: 0,
-                        laba: 0,
-                        totalKomisi: 0,
-                        kasBC: 0,
-                        totalPoin: 0,
-                        anggota: {},
-                        hari: {}
-                    };
-                    if (window.dataKelompok[k] && !isBazar) {
-                        window.dataKelompok[k].forEach(namaMember => {
-                            statsKelompok[k].anggota[namaMember] = 0;
-                        });
-                    }
+                kelompokPiket.forEach(k => {
+                    statsKelompok[k] = { nama: k, omset: 0, komisi: 0, kasBC: 0, totalPoin: 0, anggota: {}, hari: {} };
                 });
 
-                // Tarik Transaksi Berdasarkan Kelompok Masing-Masing
+                const poolPiketGabungan = { omset: 0, komisi: 0, kasBC: 0, totalPoin: 0, anggota: {} };
+                const poolBazar = { nama: "Bazar Wisuda", omset: 0, komisi: 0, kasBC: 0, totalPoin: 0, anggota: {}, hari: {} };
+
+                let gOmset = 0, gKomisi = 0, gKas = 0;
+
+                // 1. Rekap Transaksi per Tanggal & Kelompok
                 trxSnap.forEach(d => {
                     const tx = d.data();
                     if (tx.date >= start && tx.date <= end) {
@@ -574,44 +558,70 @@
                             const p = tx.date.split('-'), dn = new Date(p[0], p[1] - 1, p[2]).getDay();
                             klp = dn === 1 ? "Kelompok 1" : dn === 2 ? "Kelompok 2" : dn === 3 ? "Kelompok 3" : dn === 4 ? "Kelompok 4" : "Bazar Wisuda";
                         }
-                        if (!statsKelompok[klp]) return;
-                        const target = statsKelompok[klp];
 
                         const omset = tx.omset || 0;
                         const modal = tx.modal || 0;
                         const laba = omset - modal;
-                        const komisi = laba * target.rasioKar;
-                        const kasBC = laba * target.rasioKas;
 
-                        gOmset += omset; gKomisi += komisi; gKas += kasBC;
-                        target.omset += omset; target.modal += modal; target.laba += laba; target.totalKomisi += komisi; target.kasBC += kasBC;
+                        if (klp === "Bazar Wisuda") {
+                            const komisi = laba * 0.7;
+                            const kasBC = laba * 0.3;
+                            gOmset += omset; gKomisi += komisi; gKas += kasBC;
 
-                        if (!target.hari[tx.date]) target.hari[tx.date] = { omset: 0, modal: 0, laba: 0, komisi: 0, kasBC: 0 };
-                        target.hari[tx.date].omset += omset;
-                        target.hari[tx.date].modal += modal;
-                        target.hari[tx.date].laba += laba;
-                        target.hari[tx.date].komisi += komisi;
-                        target.hari[tx.date].kasBC += kasBC;
-                    }
-                });
+                            poolBazar.omset += omset;
+                            poolBazar.komisi += komisi;
+                            poolBazar.kasBC += kasBC;
 
-                // Tarik Absensi Berdasarkan Kelompok Masing-Masing
-                attSnap.forEach(d => {
-                    const a = d.data();
-                    if (a.date >= start && a.date <= end) {
-                        const klp = a.kelompok || "Bazar Wisuda";
-                        if (!statsKelompok[klp]) return;
-                        const poin = a.poin || 1;
-                        statsKelompok[klp].anggota[a.nama] = (statsKelompok[klp].anggota[a.nama] || 0) + poin;
-                        statsKelompok[klp].totalPoin += poin;
+                            if (!poolBazar.hari[tx.date]) poolBazar.hari[tx.date] = { omset: 0, komisi: 0, kasBC: 0 };
+                            poolBazar.hari[tx.date].omset += omset;
+                            poolBazar.hari[tx.date].komisi += komisi;
+                            poolBazar.hari[tx.date].kasBC += kasBC;
+                        } else {
+                            const targetKlp = statsKelompok[klp] || statsKelompok["Kelompok 1"];
+                            const komisi = laba * 0.8;
+                            const kasBC = laba * 0.2;
+                            gOmset += omset; gKomisi += komisi; gKas += kasBC;
 
-                        if (!statsKelompok[klp].hari[a.date]) {
-                            statsKelompok[klp].hari[a.date] = { omset: 0, modal: 0, laba: 0, komisi: 0, kasBC: 0 };
+                            targetKlp.omset += omset;
+                            targetKlp.komisi += komisi;
+                            targetKlp.kasBC += kasBC;
+
+                            poolPiketGabungan.omset += omset;
+                            poolPiketGabungan.komisi += komisi;
+                            poolPiketGabungan.kasBC += kasBC;
+
+                            if (!targetKlp.hari[tx.date]) targetKlp.hari[tx.date] = { omset: 0, komisi: 0, kasBC: 0 };
+                            targetKlp.hari[tx.date].omset += omset;
+                            targetKlp.hari[tx.date].komisi += komisi;
+                            targetKlp.hari[tx.date].kasBC += kasBC;
                         }
                     }
                 });
 
-                if (gOmset === 0 && urutanKlp.every(k => statsKelompok[k].totalPoin === 0)) {
+                // 2. Rekap Absensi / Poin per Anggota & Kelompok
+                attSnap.forEach(d => {
+                    const a = d.data();
+                    if (a.date >= start && a.date <= end) {
+                        const klp = a.kelompok || "Kelompok 1";
+                        const poin = a.poin || 1;
+                        if (klp === "Bazar Wisuda") {
+                            poolBazar.anggota[a.nama] = (poolBazar.anggota[a.nama] || 0) + poin;
+                            poolBazar.totalPoin += poin;
+                            if (!poolBazar.hari[a.date]) poolBazar.hari[a.date] = { omset: 0, komisi: 0, kasBC: 0 };
+                        } else {
+                            const targetKlp = statsKelompok[klp] || statsKelompok["Kelompok 1"];
+                            targetKlp.anggota[a.nama] = (targetKlp.anggota[a.nama] || 0) + poin;
+                            targetKlp.totalPoin += poin;
+
+                            poolPiketGabungan.anggota[a.nama] = (poolPiketGabungan.anggota[a.nama] || 0) + poin;
+                            poolPiketGabungan.totalPoin += poin;
+
+                            if (!targetKlp.hari[a.date]) targetKlp.hari[a.date] = { omset: 0, komisi: 0, kasBC: 0 };
+                        }
+                    }
+                });
+
+                if (gOmset === 0 && poolPiketGabungan.totalPoin === 0 && poolBazar.totalPoin === 0) {
                     res.innerHTML = '<p class="text-center text-slate-400 text-xs italic py-6">Tidak ada data transaksi maupun absensi pada rentang tanggal ini.</p>';
                     return;
                 }
@@ -623,26 +633,22 @@
                     <div><p class="text-[9px] text-cyan-400 uppercase font-bold">Total Kas BC</p><p class="text-xs sm:text-sm font-black text-cyan-400 mt-0.5">${formatIDR(gKas)}</p></div>
                 </div>`;
 
+                const nilaiPerPoinPiket = poolPiketGabungan.totalPoin > 0 ? (poolPiketGabungan.komisi / poolPiketGabungan.totalPoin) : 0;
                 const gabunganAnggota = {};
 
-                // Render Kartu Per Kelompok (Kelompok 1 - 4 & Bazar Wisuda)
-                urutanKlp.forEach(k => {
+                // 3. Render Rincian Per Kelompok Piket (1 - 4) dengan tarif poin gabungan piket (80:20)
+                kelompokPiket.forEach(k => {
                     const pData = statsKelompok[k];
-                    const hasHari = Object.keys(pData.hari).length > 0;
-                    if (pData.omset === 0 && pData.totalPoin === 0 && !hasHari) return;
-
-                    const perPoin = pData.totalPoin > 0 ? (pData.totalKomisi / pData.totalPoin) : 0;
-                    const isBazar = pData.isBazar;
-                    const labelPersen = isBazar ? 'Komisi 70%' : 'Komisi 80%';
-
-                    // RINCIAN PER TANGGAL JAGA KELOMPOK TERSEBUT
                     const hariEntries = Object.entries(pData.hari).sort();
+                    const anggotaAdaPoin = Object.keys(pData.anggota).filter(n => (pData.anggota[n] || 0) > 0);
+                    if (pData.omset === 0 && hariEntries.length === 0 && anggotaAdaPoin.length === 0) return;
+
                     let rincianHariHtml = '';
                     if (hariEntries.length > 0) {
                         rincianHariHtml = `
-                        <div class="mb-3.5">
+                        <div class="mb-3">
                             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1.5"><i class="fa-regular fa-calendar-days mr-1"></i>Rincian Tanggal Jaga ${k}:</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
                                 ${hariEntries.map(([tgl, dH]) => `
                                     <div class="bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-sm text-xs flex flex-col justify-between">
                                         <div class="flex justify-between items-center border-b border-slate-100 pb-1 mb-1.5">
@@ -650,8 +656,8 @@
                                             <span class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Omset: ${formatIDR(dH.omset)}</span>
                                         </div>
                                         <div class="flex justify-between text-[11px]">
-                                            <span class="text-emerald-600 font-bold">Komisi (${isBazar ? '70%' : '80%'}): ${formatIDR(dH.komisi)}</span>
-                                            <span class="text-cyan-600 font-bold">Kas BC (${isBazar ? '30%' : '20%'}): ${formatIDR(dH.kasBC)}</span>
+                                            <span class="text-emerald-600 font-bold">Komisi (80%): ${formatIDR(dH.komisi)}</span>
+                                            <span class="text-cyan-600 font-bold">Kas BC (20%): ${formatIDR(dH.kasBC)}</span>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -659,64 +665,130 @@
                         </div>`;
                     }
 
-                    // DAFTAR ANGGOTA KELOMPOK + FITUR EDIT POIN
                     const anggotaSorted = Object.keys(pData.anggota).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
-                    let daftarAnggotaHtml = '';
-                    if (anggotaSorted.length === 0) {
-                        daftarAnggotaHtml = `<p class="text-[11px] text-slate-400 italic">Belum ada anggota yang tercatat absen.</p>`;
-                    } else {
-                        daftarAnggotaHtml = anggotaSorted.map(namaOrang => {
-                            const poin = pData.anggota[namaOrang] || 0;
-                            const nominal = poin * perPoin;
+                    const daftarAnggotaHtml = anggotaSorted.map(namaOrang => {
+                        const poin = pData.anggota[namaOrang] || 0;
+                        const nominal = poin * nilaiPerPoinPiket;
+                        if (poin > 0) {
                             if (!gabunganAnggota[namaOrang]) gabunganAnggota[namaOrang] = { poin: 0, komisi: 0, rincian: [] };
-                            if (poin > 0) {
-                                gabunganAnggota[namaOrang].poin += poin;
-                                gabunganAnggota[namaOrang].komisi += nominal;
-                                gabunganAnggota[namaOrang].rincian.push(`${k}: ${poin} Poin (${formatIDR(nominal)})`);
-                            }
+                            gabunganAnggota[namaOrang].poin += poin;
+                            gabunganAnggota[namaOrang].komisi += nominal;
+                            gabunganAnggota[namaOrang].rincian.push(`Piket (${k}): ${poin} Poin (${formatIDR(nominal)})`);
+                        }
 
-                            return `
-                            <div class="flex justify-between items-center text-xs bg-white px-3 py-2.5 rounded-xl border border-slate-100 shadow-sm">
-                                <span class="font-extrabold text-slate-700">${namaOrang}</span>
-                                <div class="flex items-center gap-2">
-                                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
-                                        <button onclick="ubahPoinLaporan('${namaOrang}', -1, '${k}')" class="w-5 h-5 bg-white text-slate-500 hover:text-red-500 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Kurangi 1 Poin">-</button>
-                                        <span onclick="inputManualPoin('${namaOrang}', ${poin}, '${k}')" class="px-1.5 font-bold text-[10px] text-indigo-600 cursor-pointer hover:underline" title="Klik untuk edit manual">${poin} Poin</span>
-                                        <button onclick="ubahPoinLaporan('${namaOrang}', 1, '${k}')" class="w-5 h-5 bg-white text-slate-500 hover:text-emerald-600 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Tambah 1 Poin">+</button>
-                                    </div>
-                                    <span class="font-black text-slate-800 min-w-[70px] text-right">${formatIDR(nominal)}</span>
+                        return `
+                        <div class="flex justify-between items-center text-xs bg-white px-3 py-2.5 rounded-xl border border-slate-100 shadow-sm">
+                            <span class="font-extrabold text-slate-700">${namaOrang}</span>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+                                    <button onclick="ubahPoinLaporan('${namaOrang}', -1, '${k}')" class="w-5 h-5 bg-white text-slate-500 hover:text-red-500 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Kurangi 1 Poin">-</button>
+                                    <span onclick="inputManualPoin('${namaOrang}', ${poin}, '${k}')" class="px-1.5 font-bold text-[10px] text-indigo-600 cursor-pointer hover:underline" title="Klik untuk edit manual">${poin} Poin</span>
+                                    <button onclick="ubahPoinLaporan('${namaOrang}', 1, '${k}')" class="w-5 h-5 bg-white text-slate-500 hover:text-emerald-600 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Tambah 1 Poin">+</button>
                                 </div>
-                            </div>`;
-                        }).join('');
-                    }
+                                <span class="font-black text-slate-800 min-w-[70px] text-right">${formatIDR(nominal)}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
 
                     html += `
-                    <div class="${isBazar ? 'bg-amber-50/70 border-amber-200' : 'bg-slate-50 border-slate-200'} border rounded-2xl p-4 shadow-sm">
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm">
                         <div class="flex justify-between items-start border-b border-slate-200 pb-2.5 mb-3">
                             <div>
-                                <h3 class="font-black text-slate-800 text-sm">${isBazar ? '🎓 ' + pData.nama + ' [70:30]' : pData.nama + ' [80:20]'}</h3>
-                                <p class="text-[10px] text-slate-500 font-bold mt-0.5">Total Poin: ${pData.totalPoin} Poin • (1 Poin = ${formatIDR(perPoin)})</p>
+                                <h3 class="font-black text-slate-800 text-sm">${k} (Pool Piket 80:20)</h3>
+                                <p class="text-[10px] text-slate-500 font-bold mt-0.5">Pool Piket: ${formatIDR(poolPiketGabungan.komisi)} • Total Poin Piket: ${poolPiketGabungan.totalPoin} Poin (1 Poin = ${formatIDR(nilaiPerPoinPiket)})</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[9px] text-emerald-600 font-extrabold uppercase">${labelPersen}</p>
-                                <p class="font-black text-emerald-600 text-base">${formatIDR(pData.totalKomisi)}</p>
+                                <p class="text-[9px] text-emerald-600 font-extrabold uppercase">Komisi 80% ${k}</p>
+                                <p class="font-black text-emerald-600 text-base">${formatIDR(pData.komisi)}</p>
                             </div>
                         </div>
                         ${rincianHariHtml}
                         <div class="space-y-1.5">
-                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Daftar Anggota ${k} (Edit Poin [ - / + ]):</p>
+                            <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Anggota ${k} (Dibagi Rata Poin Piket Gabungan):</p>
                             ${daftarAnggotaHtml}
                         </div>
                     </div>`;
                 });
 
-                // AKUMULASI KOMISI TOTAL PER ANGGOTA (SEMUA KELOMPOK + BAZAR)
+                // 4. Render Bazar Wisuda Terpisah (70:30)
+                const bazarHariEntries = Object.entries(poolBazar.hari).sort();
+                const bazarAnggotaSorted = Object.keys(poolBazar.anggota).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+                if (poolBazar.omset > 0 || bazarHariEntries.length > 0 || bazarAnggotaSorted.length > 0) {
+                    const perPoinBazar = poolBazar.totalPoin > 0 ? (poolBazar.komisi / poolBazar.totalPoin) : 0;
+
+                    let bazarHariHtml = '';
+                    if (bazarHariEntries.length > 0) {
+                        bazarHariHtml = `
+                        <div class="mb-3">
+                            <p class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wider mb-1.5"><i class="fa-regular fa-calendar-days mr-1"></i>Rincian Tanggal Bazar Wisuda:</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
+                                ${bazarHariEntries.map(([tgl, dH]) => `
+                                    <div class="bg-white p-2.5 rounded-xl border border-amber-200/80 shadow-sm text-xs flex flex-col justify-between">
+                                        <div class="flex justify-between items-center border-b border-amber-100 pb-1 mb-1.5">
+                                            <span class="font-extrabold text-slate-800">📅 ${tgl}</span>
+                                            <span class="text-[10px] font-black text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">Omset: ${formatIDR(dH.omset)}</span>
+                                        </div>
+                                        <div class="flex justify-between text-[11px]">
+                                            <span class="text-emerald-600 font-bold">Komisi (70%): ${formatIDR(dH.komisi)}</span>
+                                            <span class="text-cyan-600 font-bold">Kas BC (30%): ${formatIDR(dH.kasBC)}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                    }
+
+                    const bazarAnggotaHtml = bazarAnggotaSorted.length ? bazarAnggotaSorted.map(namaOrang => {
+                        const poin = poolBazar.anggota[namaOrang] || 0;
+                        const nominal = poin * perPoinBazar;
+                        if (poin > 0) {
+                            if (!gabunganAnggota[namaOrang]) gabunganAnggota[namaOrang] = { poin: 0, komisi: 0, rincian: [] };
+                            gabunganAnggota[namaOrang].poin += poin;
+                            gabunganAnggota[namaOrang].komisi += nominal;
+                            gabunganAnggota[namaOrang].rincian.push(`Bazar Wisuda: ${poin} Poin (${formatIDR(nominal)})`);
+                        }
+
+                        return `
+                        <div class="flex justify-between items-center text-xs bg-white px-3 py-2.5 rounded-xl border border-amber-100 shadow-sm">
+                            <span class="font-extrabold text-slate-700">${namaOrang}</span>
+                            <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1 bg-amber-50/60 border border-amber-200 rounded-lg p-0.5">
+                                    <button onclick="ubahPoinLaporan('${namaOrang}', -1, 'Bazar Wisuda')" class="w-5 h-5 bg-white text-slate-500 hover:text-red-500 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Kurangi 1 Poin">-</button>
+                                    <span onclick="inputManualPoin('${namaOrang}', ${poin}, 'Bazar Wisuda')" class="px-1.5 font-bold text-[10px] text-amber-700 cursor-pointer hover:underline" title="Klik untuk edit manual">${poin} Poin</span>
+                                    <button onclick="ubahPoinLaporan('${namaOrang}', 1, 'Bazar Wisuda')" class="w-5 h-5 bg-white text-slate-500 hover:text-emerald-600 rounded flex items-center justify-center font-black text-[10px] shadow-sm" title="Tambah 1 Poin">+</button>
+                                </div>
+                                <span class="font-black text-slate-800 min-w-[70px] text-right">${formatIDR(nominal)}</span>
+                            </div>
+                        </div>`;
+                    }).join('') : `<p class="text-[11px] text-slate-400 italic">Belum ada anggota yang tercatat absen di Bazar Wisuda.</p>`;
+
+                    html += `
+                    <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 shadow-sm">
+                        <div class="flex justify-between items-start border-b border-amber-200 pb-2.5 mb-3">
+                            <div>
+                                <h3 class="font-black text-slate-800 text-sm">🎓 Bazar Wisuda / Event [70:30]</h3>
+                                <p class="text-[10px] text-slate-600 font-bold mt-0.5">Total Poin Bazar: ${poolBazar.totalPoin} Poin • (1 Poin = ${formatIDR(perPoinBazar)})</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] text-emerald-600 font-extrabold uppercase">Komisi 70%</p>
+                                <p class="font-black text-emerald-600 text-base">${formatIDR(poolBazar.komisi)}</p>
+                            </div>
+                        </div>
+                        ${bazarHariHtml}
+                        <div class="space-y-1.5">
+                            <p class="text-[10px] font-extrabold text-amber-700 uppercase tracking-wider mb-1">Anggota Bazar Wisuda (Terpisah dari Piket):</p>
+                            ${bazarAnggotaHtml}
+                        </div>
+                    </div>`;
+                }
+
+                // 5. Rekap Total Diterima Per Anggota (Gabungan Piket + Bazar)
                 const semuaSorted = Object.keys(gabunganAnggota).filter(n => gabunganAnggota[n].poin > 0).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
                 if (semuaSorted.length > 0) {
                     html += `
                     <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 shadow-sm">
                         <h3 class="font-black text-indigo-950 text-sm mb-0.5"><i class="fa-solid fa-users mr-1.5"></i>Total Komisi Bersih Diterima Per Anggota (A-Z)</h3>
-                        <p class="text-[10px] text-indigo-600 font-bold mb-3">Akumulasi Jadwal Kelompok Harian (80%) + Bazar Wisuda (70%)</p>
+                        <p class="text-[10px] text-indigo-600 font-bold mb-3">Akumulasi Pool Piket (80%) + Bazar Wisuda (70%)</p>
                         <div class="space-y-1.5">
                             ${semuaSorted.map(nama => {
                                 const d = gabunganAnggota[nama];
@@ -826,8 +898,7 @@
         };
 
         function tampilkanModalAkhir(val = state.namaKasir, klp = state.activeKelompok) {
-            const laba = state.totalOmset - state.totalModal;
-            const isBz = (klp || state.activeKelompok) === 'Bazar Wisuda';
+            const laba = state.totalOmset - state.totalModal, isBz = (klp || state.activeKelompok) === 'Bazar Wisuda';
             const rKar = isBz ? 0.7 : 0.8, rCaf = isBz ? 0.3 : 0.2;
             const names = Object.keys(state.rekapPenjualan).sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
 
